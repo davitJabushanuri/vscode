@@ -1,6 +1,6 @@
 {
-	"nameShort": "Bubz Editor",
-	"nameLong": "Bubz Editor - VS Code with Continue AI",
+	"nameShort": "Architech",
+	"nameLong": "Architech - AI Editor",
 	"applicationName": "code-oss",
 	"dataFolderName": ".vscode-oss",
 	"win32MutexName": "vscodeoss",
