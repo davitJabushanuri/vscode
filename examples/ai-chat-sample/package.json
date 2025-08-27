@@ -1,0 +1,51 @@
+{
+    "name": "ai-chat-sample",
+    "displayName": "AI Chat Sample Extension",
+    "description": "Sample extension demonstrating AI chat participant integration",
+    "version": "1.0.0",
+    "engines": {
+        "vscode": "^1.90.0"
+    },
+    "categories": ["AI", "Chat", "Other"],
+    "activationEvents": ["onStartupFinished"],
+    "main": "./out/extension.js",
+    "contributes": {
+        "chatParticipants": [
+            {
+                "id": "simple-ai",
+                "name": "SimpleAI",
+                "description": "A simple AI assistant for basic questions",
+                "isSticky": true
+            },
+            {
+                "id": "streaming-ai", 
+                "name": "StreamingAI",
+                "description": "An AI assistant that demonstrates streaming responses",
+                "isSticky": false
+            },
+            {
+                "id": "file-ai",
+                "name": "FileAI", 
+                "description": "An AI assistant that can analyze files",
+                "isSticky": false
+            }
+        ],
+        "commands": [
+            {
+                "command": "ai-chat-sample.openChat",
+                "title": "Open AI Chat",
+                "category": "AI Chat Sample"
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./"
+    },
+    "devDependencies": {
+        "@types/vscode": "^1.90.0",
+        "@types/node": "20.x",
+        "typescript": "^5.4.5"
+    }
+}

@@ -1,0 +1,59 @@
+{
+    "name": "external-ai-chat",
+    "displayName": "External AI Chat Integration",
+    "description": "Demonstrates connecting VS Code chat to external AI services",
+    "version": "1.0.0",
+    "engines": {
+        "vscode": "^1.90.0"
+    },
+    "categories": ["AI", "Chat"],
+    "activationEvents": ["onStartupFinished"],
+    "main": "./out/external-ai.js",
+    "contributes": {
+        "chatParticipants": [
+            {
+                "id": "external-ai",
+                "name": "ExternalAI",
+                "description": "Connect to your external AI service",
+                "isSticky": true
+            }
+        ],
+        "commands": [
+            {
+                "command": "external-ai.configure",
+                "title": "Configure External AI",
+                "category": "External AI"
+            }
+        ],
+        "configuration": {
+            "title": "External AI",
+            "properties": {
+                "externalAI.endpoint": {
+                    "type": "string",
+                    "default": "",
+                    "description": "The endpoint URL for your AI service (e.g., OpenAI API, local server)"
+                },
+                "externalAI.apiKey": {
+                    "type": "string",
+                    "default": "",
+                    "description": "API key for authenticating with your AI service"
+                },
+                "externalAI.model": {
+                    "type": "string",
+                    "default": "gpt-3.5-turbo",
+                    "description": "The model to use for chat completions"
+                }
+            }
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./"
+    },
+    "devDependencies": {
+        "@types/vscode": "^1.90.0",
+        "@types/node": "20.x",
+        "typescript": "^5.4.5"
+    }
+}
