@@ -3,96 +3,192 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import './media/chatSetup.css';
-import { $ } from '../../../../base/browser/dom.js';
-import { IButton } from '../../../../base/browser/ui/button/button.js';
-import { Dialog, DialogContentsAlignment } from '../../../../base/browser/ui/dialog/dialog.js';
-import { WorkbenchActionExecutedClassification, WorkbenchActionExecutedEvent } from '../../../../base/common/actions.js';
-import { coalesce } from '../../../../base/common/arrays.js';
-import { timeout } from '../../../../base/common/async.js';
-import { CancellationToken } from '../../../../base/common/cancellation.js';
-import { Codicon } from '../../../../base/common/codicons.js';
-import { toErrorMessage } from '../../../../base/common/errorMessage.js';
-import { isCancellationError } from '../../../../base/common/errors.js';
-import { Emitter, Event } from '../../../../base/common/event.js';
-import { MarkdownString } from '../../../../base/common/htmlContent.js';
-import { Lazy } from '../../../../base/common/lazy.js';
-import { Disposable, DisposableStore, IDisposable, markAsSingleton, MutableDisposable } from '../../../../base/common/lifecycle.js';
-import Severity from '../../../../base/common/severity.js';
-import { StopWatch } from '../../../../base/common/stopwatch.js';
-import { equalsIgnoreCase } from '../../../../base/common/strings.js';
-import { isObject } from '../../../../base/common/types.js';
-import { URI } from '../../../../base/common/uri.js';
-import { ServicesAccessor } from '../../../../editor/browser/editorExtensions.js';
-import { MarkdownRenderer } from '../../../../editor/browser/widget/markdownRenderer/browser/markdownRenderer.js';
-import { localize, localize2 } from '../../../../nls.js';
-import { Action2, MenuId, registerAction2 } from '../../../../platform/actions/common/actions.js';
-import { ICommandService } from '../../../../platform/commands/common/commands.js';
-import { ConfigurationTarget, IConfigurationService } from '../../../../platform/configuration/common/configuration.js';
-import { Extensions as ConfigurationExtensions, IConfigurationRegistry } from '../../../../platform/configuration/common/configurationRegistry.js';
-import { ContextKeyExpr, IContextKeyService } from '../../../../platform/contextkey/common/contextkey.js';
-import { createWorkbenchDialogOptions } from '../../../../platform/dialogs/browser/dialog.js';
-import { IDialogService } from '../../../../platform/dialogs/common/dialogs.js';
-import { ExtensionIdentifier } from '../../../../platform/extensions/common/extensions.js';
-import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
-import { IKeybindingService } from '../../../../platform/keybinding/common/keybinding.js';
-import { ILayoutService } from '../../../../platform/layout/browser/layoutService.js';
-import { ILogService } from '../../../../platform/log/common/log.js';
-import { IOpenerService } from '../../../../platform/opener/common/opener.js';
-import product from '../../../../platform/product/common/product.js';
-import { IProductService } from '../../../../platform/product/common/productService.js';
-import { IProgressService, ProgressLocation } from '../../../../platform/progress/common/progress.js';
-import { IQuickInputService } from '../../../../platform/quickinput/common/quickInput.js';
-import { Registry } from '../../../../platform/registry/common/platform.js';
-import { ITelemetryService, TelemetryLevel } from '../../../../platform/telemetry/common/telemetry.js';
-import { IWorkspaceTrustManagementService, IWorkspaceTrustRequestService } from '../../../../platform/workspace/common/workspaceTrust.js';
-import { IWorkbenchContribution } from '../../../common/contributions.js';
-import { IViewDescriptorService, ViewContainerLocation } from '../../../common/views.js';
-import { IActivityService, ProgressBadge } from '../../../services/activity/common/activity.js';
-import { AuthenticationSession, IAuthenticationService } from '../../../services/authentication/common/authentication.js';
-import { IWorkbenchEnvironmentService } from '../../../services/environment/common/environmentService.js';
-import { EnablementState, IWorkbenchExtensionEnablementService } from '../../../services/extensionManagement/common/extensionManagement.js';
-import { ExtensionUrlHandlerOverrideRegistry } from '../../../services/extensions/browser/extensionUrlHandler.js';
-import { nullExtensionDescription } from '../../../services/extensions/common/extensions.js';
-import { IHostService } from '../../../services/host/browser/host.js';
-import { IWorkbenchLayoutService, Parts } from '../../../services/layout/browser/layoutService.js';
-import { ILifecycleService } from '../../../services/lifecycle/common/lifecycle.js';
-import { IViewsService } from '../../../services/views/common/viewsService.js';
-import { CountTokensCallback, ILanguageModelToolsService, IPreparedToolInvocation, IToolData, IToolImpl, IToolInvocation, IToolResult, ToolDataSource, ToolProgress } from '../../chat/common/languageModelToolsService.js';
-import { IExtensionsWorkbenchService } from '../../extensions/common/extensions.js';
-import { IChatAgentImplementation, IChatAgentRequest, IChatAgentResult, IChatAgentService } from '../common/chatAgents.js';
-import { ChatContextKeys } from '../common/chatContextKeys.js';
-import { ChatEntitlement, ChatEntitlementContext, ChatEntitlementRequests, ChatEntitlementService, IChatEntitlementService, isProUser } from '../common/chatEntitlementService.js';
-import { ChatModel, ChatRequestModel, IChatRequestModel, IChatRequestVariableData } from '../common/chatModel.js';
-import { ChatMode } from '../common/chatModes.js';
-import { ChatRequestAgentPart, ChatRequestToolPart } from '../common/chatParserTypes.js';
-import { IChatProgress, IChatService } from '../common/chatService.js';
-import { IChatRequestToolEntry } from '../common/chatVariableEntries.js';
-import { ChatAgentLocation, ChatConfiguration, ChatModeKind, validateChatMode } from '../common/constants.js';
-import { ILanguageModelsService } from '../common/languageModels.js';
-import { CHAT_CATEGORY, CHAT_OPEN_ACTION_ID, CHAT_SETUP_ACTION_ID } from './actions/chatActions.js';
-import { ChatViewId, IChatWidgetService, showCopilotView } from './chat.js';
-import { CHAT_SIDEBAR_PANEL_ID } from './chatViewPane.js';
-import { chatViewsWelcomeRegistry } from './viewsWelcome/chatViewsWelcome.js';
+import "./media/chatSetup.css";
+import { $ } from "../../../../base/browser/dom.js";
+import { IButton } from "../../../../base/browser/ui/button/button.js";
+import {
+	Dialog,
+	DialogContentsAlignment,
+} from "../../../../base/browser/ui/dialog/dialog.js";
+import {
+	WorkbenchActionExecutedClassification,
+	WorkbenchActionExecutedEvent,
+} from "../../../../base/common/actions.js";
+import { coalesce } from "../../../../base/common/arrays.js";
+import { timeout } from "../../../../base/common/async.js";
+import { CancellationToken } from "../../../../base/common/cancellation.js";
+import { Codicon } from "../../../../base/common/codicons.js";
+import { toErrorMessage } from "../../../../base/common/errorMessage.js";
+import { isCancellationError } from "../../../../base/common/errors.js";
+import { Emitter, Event } from "../../../../base/common/event.js";
+import { MarkdownString } from "../../../../base/common/htmlContent.js";
+import { Lazy } from "../../../../base/common/lazy.js";
+import {
+	Disposable,
+	DisposableStore,
+	IDisposable,
+	markAsSingleton,
+	MutableDisposable,
+} from "../../../../base/common/lifecycle.js";
+import Severity from "../../../../base/common/severity.js";
+import { StopWatch } from "../../../../base/common/stopwatch.js";
+import { equalsIgnoreCase } from "../../../../base/common/strings.js";
+import { isObject } from "../../../../base/common/types.js";
+import { URI } from "../../../../base/common/uri.js";
+import { ServicesAccessor } from "../../../../editor/browser/editorExtensions.js";
+import { MarkdownRenderer } from "../../../../editor/browser/widget/markdownRenderer/browser/markdownRenderer.js";
+import { localize, localize2 } from "../../../../nls.js";
+import {
+	Action2,
+	MenuId,
+	registerAction2,
+} from "../../../../platform/actions/common/actions.js";
+import { ICommandService } from "../../../../platform/commands/common/commands.js";
+import {
+	ConfigurationTarget,
+	IConfigurationService,
+} from "../../../../platform/configuration/common/configuration.js";
+import {
+	Extensions as ConfigurationExtensions,
+	IConfigurationRegistry,
+} from "../../../../platform/configuration/common/configurationRegistry.js";
+import {
+	ContextKeyExpr,
+	IContextKeyService,
+} from "../../../../platform/contextkey/common/contextkey.js";
+import { createWorkbenchDialogOptions } from "../../../../platform/dialogs/browser/dialog.js";
+import { IDialogService } from "../../../../platform/dialogs/common/dialogs.js";
+import { ExtensionIdentifier } from "../../../../platform/extensions/common/extensions.js";
+import { IInstantiationService } from "../../../../platform/instantiation/common/instantiation.js";
+import { IKeybindingService } from "../../../../platform/keybinding/common/keybinding.js";
+import { ILayoutService } from "../../../../platform/layout/browser/layoutService.js";
+import { ILogService } from "../../../../platform/log/common/log.js";
+import { IOpenerService } from "../../../../platform/opener/common/opener.js";
+import product from "../../../../platform/product/common/product.js";
+import { IProductService } from "../../../../platform/product/common/productService.js";
+import {
+	IProgressService,
+	ProgressLocation,
+} from "../../../../platform/progress/common/progress.js";
+import { IQuickInputService } from "../../../../platform/quickinput/common/quickInput.js";
+import { Registry } from "../../../../platform/registry/common/platform.js";
+import {
+	ITelemetryService,
+	TelemetryLevel,
+} from "../../../../platform/telemetry/common/telemetry.js";
+import {
+	IWorkspaceTrustManagementService,
+	IWorkspaceTrustRequestService,
+} from "../../../../platform/workspace/common/workspaceTrust.js";
+import { IWorkbenchContribution } from "../../../common/contributions.js";
+import {
+	IViewDescriptorService,
+	ViewContainerLocation,
+} from "../../../common/views.js";
+import {
+	IActivityService,
+	ProgressBadge,
+} from "../../../services/activity/common/activity.js";
+import {
+	AuthenticationSession,
+	IAuthenticationService,
+} from "../../../services/authentication/common/authentication.js";
+import { IWorkbenchEnvironmentService } from "../../../services/environment/common/environmentService.js";
+import {
+	EnablementState,
+	IWorkbenchExtensionEnablementService,
+} from "../../../services/extensionManagement/common/extensionManagement.js";
+import { ExtensionUrlHandlerOverrideRegistry } from "../../../services/extensions/browser/extensionUrlHandler.js";
+import { nullExtensionDescription } from "../../../services/extensions/common/extensions.js";
+import { IHostService } from "../../../services/host/browser/host.js";
+import {
+	IWorkbenchLayoutService,
+	Parts,
+} from "../../../services/layout/browser/layoutService.js";
+import { ILifecycleService } from "../../../services/lifecycle/common/lifecycle.js";
+import { IViewsService } from "../../../services/views/common/viewsService.js";
+import {
+	CountTokensCallback,
+	ILanguageModelToolsService,
+	IPreparedToolInvocation,
+	IToolData,
+	IToolImpl,
+	IToolInvocation,
+	IToolResult,
+	ToolDataSource,
+	ToolProgress,
+} from "../../chat/common/languageModelToolsService.js";
+import { IExtensionsWorkbenchService } from "../../extensions/common/extensions.js";
+import {
+	IChatAgentImplementation,
+	IChatAgentRequest,
+	IChatAgentResult,
+	IChatAgentService,
+} from "../common/chatAgents.js";
+import { ChatContextKeys } from "../common/chatContextKeys.js";
+import {
+	ChatEntitlement,
+	ChatEntitlementContext,
+	ChatEntitlementRequests,
+	ChatEntitlementService,
+	IChatEntitlementService,
+	isProUser,
+} from "../common/chatEntitlementService.js";
+import {
+	ChatModel,
+	ChatRequestModel,
+	IChatRequestModel,
+	IChatRequestVariableData,
+} from "../common/chatModel.js";
+import { ChatMode } from "../common/chatModes.js";
+import {
+	ChatRequestAgentPart,
+	ChatRequestToolPart,
+} from "../common/chatParserTypes.js";
+import { IChatProgress, IChatService } from "../common/chatService.js";
+import { IChatRequestToolEntry } from "../common/chatVariableEntries.js";
+import {
+	ChatAgentLocation,
+	ChatConfiguration,
+	ChatModeKind,
+	validateChatMode,
+} from "../common/constants.js";
+import { ILanguageModelsService } from "../common/languageModels.js";
+import {
+	CHAT_CATEGORY,
+	CHAT_OPEN_ACTION_ID,
+	CHAT_SETUP_ACTION_ID,
+} from "./actions/chatActions.js";
+import { ChatViewId, IChatWidgetService, showCopilotView } from "./chat.js";
+import { CHAT_SIDEBAR_PANEL_ID } from "./chatViewPane.js";
+import { chatViewsWelcomeRegistry } from "./viewsWelcome/chatViewsWelcome.js";
 
 const defaultChat = {
-	extensionId: product.defaultChatAgent?.extensionId ?? '',
-	chatExtensionId: product.defaultChatAgent?.chatExtensionId ?? '',
-	documentationUrl: product.defaultChatAgent?.documentationUrl ?? '',
-	skusDocumentationUrl: product.defaultChatAgent?.skusDocumentationUrl ?? '',
-	publicCodeMatchesUrl: product.defaultChatAgent?.publicCodeMatchesUrl ?? '',
-	manageOveragesUrl: product.defaultChatAgent?.manageOverageUrl ?? '',
-	upgradePlanUrl: product.defaultChatAgent?.upgradePlanUrl ?? '',
-	provider: product.defaultChatAgent?.provider ?? { default: { id: '', name: '' }, enterprise: { id: '', name: '' }, apple: { id: '', name: '' }, google: { id: '', name: '' } },
-	providerUriSetting: product.defaultChatAgent?.providerUriSetting ?? '',
+	extensionId: product.defaultChatAgent?.extensionId ?? "",
+	chatExtensionId: product.defaultChatAgent?.chatExtensionId ?? "",
+	documentationUrl: product.defaultChatAgent?.documentationUrl ?? "",
+	skusDocumentationUrl: product.defaultChatAgent?.skusDocumentationUrl ?? "",
+	publicCodeMatchesUrl: product.defaultChatAgent?.publicCodeMatchesUrl ?? "",
+	manageOveragesUrl: product.defaultChatAgent?.manageOverageUrl ?? "",
+	upgradePlanUrl: product.defaultChatAgent?.upgradePlanUrl ?? "",
+	provider: product.defaultChatAgent?.provider ?? {
+		default: { id: "", name: "" },
+		enterprise: { id: "", name: "" },
+		apple: { id: "", name: "" },
+		google: { id: "", name: "" },
+	},
+	providerUriSetting: product.defaultChatAgent?.providerUriSetting ?? "",
 	providerScopes: product.defaultChatAgent?.providerScopes ?? [[]],
-	manageSettingsUrl: product.defaultChatAgent?.manageSettingsUrl ?? '',
-	completionsAdvancedSetting: product.defaultChatAgent?.completionsAdvancedSetting ?? '',
-	walkthroughCommand: product.defaultChatAgent?.walkthroughCommand ?? '',
-	completionsRefreshTokenCommand: product.defaultChatAgent?.completionsRefreshTokenCommand ?? '',
-	chatRefreshTokenCommand: product.defaultChatAgent?.chatRefreshTokenCommand ?? '',
-	termsStatementUrl: product.defaultChatAgent?.termsStatementUrl ?? '',
-	privacyStatementUrl: product.defaultChatAgent?.privacyStatementUrl ?? ''
+	manageSettingsUrl: product.defaultChatAgent?.manageSettingsUrl ?? "",
+	completionsAdvancedSetting:
+		product.defaultChatAgent?.completionsAdvancedSetting ?? "",
+	walkthroughCommand: product.defaultChatAgent?.walkthroughCommand ?? "",
+	completionsRefreshTokenCommand:
+		product.defaultChatAgent?.completionsRefreshTokenCommand ?? "",
+	chatRefreshTokenCommand:
+		product.defaultChatAgent?.chatRefreshTokenCommand ?? "",
+	termsStatementUrl: product.defaultChatAgent?.termsStatementUrl ?? "",
+	privacyStatementUrl: product.defaultChatAgent?.privacyStatementUrl ?? "",
 };
 
 //#region Contribution
@@ -103,9 +199,14 @@ const ToolsAgentContextKey = ContextKeyExpr.and(
 );
 
 class SetupAgent extends Disposable implements IChatAgentImplementation {
-
-	static registerDefaultAgents(instantiationService: IInstantiationService, location: ChatAgentLocation, mode: ChatModeKind | undefined, context: ChatEntitlementContext, controller: Lazy<ChatSetupController>): { agent: SetupAgent; disposable: IDisposable } {
-		return instantiationService.invokeFunction(accessor => {
+	static registerDefaultAgents(
+		instantiationService: IInstantiationService,
+		location: ChatAgentLocation,
+		mode: ChatModeKind | undefined,
+		context: ChatEntitlementContext,
+		controller: Lazy<ChatSetupController>
+	): { agent: SetupAgent; disposable: IDisposable } {
+		return instantiationService.invokeFunction((accessor) => {
 			const chatAgentService = accessor.get(IChatAgentService);
 
 			let id: string;
@@ -113,86 +214,170 @@ class SetupAgent extends Disposable implements IChatAgentImplementation {
 			switch (location) {
 				case ChatAgentLocation.Panel:
 					if (mode === ChatModeKind.Ask) {
-						id = 'setup.chat';
+						id = "setup.chat";
 					} else if (mode === ChatModeKind.Edit) {
-						id = 'setup.edits';
+						id = "setup.edits";
 						description = ChatMode.Edit.description.get();
 					} else {
-						id = 'setup.agent';
+						id = "setup.agent";
 						description = ChatMode.Agent.description.get();
 					}
 					break;
 				case ChatAgentLocation.Terminal:
-					id = 'setup.terminal';
+					id = "setup.terminal";
 					break;
 				case ChatAgentLocation.Editor:
-					id = 'setup.editor';
+					id = "setup.editor";
 					break;
 				case ChatAgentLocation.Notebook:
-					id = 'setup.notebook';
+					id = "setup.notebook";
 					break;
 			}
 
-			return SetupAgent.doRegisterAgent(instantiationService, chatAgentService, id, `${defaultChat.provider.default.name} Copilot`, true, description, location, mode, context, controller);
+			return SetupAgent.doRegisterAgent(
+				instantiationService,
+				chatAgentService,
+				id,
+				`${defaultChat.provider.default.name} Copilot`,
+				true,
+				description,
+				location,
+				mode,
+				context,
+				controller
+			);
 		});
 	}
 
-	static registerBuiltInAgents(instantiationService: IInstantiationService, context: ChatEntitlementContext, controller: Lazy<ChatSetupController>): { disposable: IDisposable } {
-		return instantiationService.invokeFunction(accessor => {
+	static registerBuiltInAgents(
+		instantiationService: IInstantiationService,
+		context: ChatEntitlementContext,
+		controller: Lazy<ChatSetupController>
+	): { disposable: IDisposable } {
+		return instantiationService.invokeFunction((accessor) => {
 			const chatAgentService = accessor.get(IChatAgentService);
 
 			const disposables = new DisposableStore();
 
 			// Register VSCode agent
-			const { disposable: vscodeDisposable } = SetupAgent.doRegisterAgent(instantiationService, chatAgentService, 'setup.vscode', 'vscode', false, localize2('vscodeAgentDescription', "Ask questions about VS Code").value, ChatAgentLocation.Panel, undefined, context, controller);
+			const { disposable: vscodeDisposable } = SetupAgent.doRegisterAgent(
+				instantiationService,
+				chatAgentService,
+				"setup.vscode",
+				"vscode",
+				false,
+				localize2("vscodeAgentDescription", "Ask questions about VS Code")
+					.value,
+				ChatAgentLocation.Panel,
+				undefined,
+				context,
+				controller
+			);
 			disposables.add(vscodeDisposable);
 
 			// Register workspace agent
-			const { disposable: workspaceDisposable } = SetupAgent.doRegisterAgent(instantiationService, chatAgentService, 'setup.workspace', 'workspace', false, localize2('workspaceAgentDescription', "Ask about your workspace").value, ChatAgentLocation.Panel, undefined, context, controller);
+			const { disposable: workspaceDisposable } = SetupAgent.doRegisterAgent(
+				instantiationService,
+				chatAgentService,
+				"setup.workspace",
+				"workspace",
+				false,
+				localize2("workspaceAgentDescription", "Ask about your workspace")
+					.value,
+				ChatAgentLocation.Panel,
+				undefined,
+				context,
+				controller
+			);
 			disposables.add(workspaceDisposable);
 
 			// Register terminal agent
-			const { disposable: terminalDisposable } = SetupAgent.doRegisterAgent(instantiationService, chatAgentService, 'setup.terminal.agent', 'terminal', false, localize2('terminalAgentDescription', "Ask how to do something in the terminal").value, ChatAgentLocation.Panel, undefined, context, controller);
+			const { disposable: terminalDisposable } = SetupAgent.doRegisterAgent(
+				instantiationService,
+				chatAgentService,
+				"setup.terminal.agent",
+				"terminal",
+				false,
+				localize2(
+					"terminalAgentDescription",
+					"Ask how to do something in the terminal"
+				).value,
+				ChatAgentLocation.Panel,
+				undefined,
+				context,
+				controller
+			);
 			disposables.add(terminalDisposable);
 
 			// Register tools
-			disposables.add(SetupTool.registerTool(instantiationService, {
-				id: 'setup_tools_createNewWorkspace',
-				source: ToolDataSource.Internal,
-				icon: Codicon.newFolder,
-				displayName: localize('setupToolDisplayName', "New Workspace"),
-				modelDescription: localize('setupToolsDescription', "Scaffold a new workspace in VS Code"),
-				userDescription: localize('setupToolsDescription', "Scaffold a new workspace in VS Code"),
-				canBeReferencedInPrompt: true,
-				toolReferenceName: 'new',
-				when: ContextKeyExpr.true(),
-			}).disposable);
+			disposables.add(
+				SetupTool.registerTool(instantiationService, {
+					id: "setup_tools_createNewWorkspace",
+					source: ToolDataSource.Internal,
+					icon: Codicon.newFolder,
+					displayName: localize("setupToolDisplayName", "New Workspace"),
+					modelDescription: localize(
+						"setupToolsDescription",
+						"Scaffold a new workspace in VS Code"
+					),
+					userDescription: localize(
+						"setupToolsDescription",
+						"Scaffold a new workspace in VS Code"
+					),
+					canBeReferencedInPrompt: true,
+					toolReferenceName: "new",
+					when: ContextKeyExpr.true(),
+				}).disposable
+			);
 
 			return { disposable: disposables };
 		});
 	}
 
-	private static doRegisterAgent(instantiationService: IInstantiationService, chatAgentService: IChatAgentService, id: string, name: string, isDefault: boolean, description: string, location: ChatAgentLocation, mode: ChatModeKind | undefined, context: ChatEntitlementContext, controller: Lazy<ChatSetupController>): { agent: SetupAgent; disposable: IDisposable } {
+	private static doRegisterAgent(
+		instantiationService: IInstantiationService,
+		chatAgentService: IChatAgentService,
+		id: string,
+		name: string,
+		isDefault: boolean,
+		description: string,
+		location: ChatAgentLocation,
+		mode: ChatModeKind | undefined,
+		context: ChatEntitlementContext,
+		controller: Lazy<ChatSetupController>
+	): { agent: SetupAgent; disposable: IDisposable } {
 		const disposables = new DisposableStore();
-		disposables.add(chatAgentService.registerAgent(id, {
-			id,
-			name,
-			isDefault,
-			isCore: true,
-			modes: mode ? [mode] : [ChatModeKind.Ask],
-			when: mode === ChatModeKind.Agent ? ToolsAgentContextKey?.serialize() : undefined,
-			slashCommands: [],
-			disambiguation: [],
-			locations: [location],
-			metadata: { helpTextPrefix: SetupAgent.SETUP_NEEDED_MESSAGE },
-			description,
-			extensionId: nullExtensionDescription.identifier,
-			extensionVersion: undefined,
-			extensionDisplayName: nullExtensionDescription.name,
-			extensionPublisherId: nullExtensionDescription.publisher
-		}));
+		disposables.add(
+			chatAgentService.registerAgent(id, {
+				id,
+				name,
+				isDefault,
+				isCore: true,
+				modes: mode ? [mode] : [ChatModeKind.Ask],
+				when:
+					mode === ChatModeKind.Agent
+						? ToolsAgentContextKey?.serialize()
+						: undefined,
+				slashCommands: [],
+				disambiguation: [],
+				locations: [location],
+				metadata: { helpTextPrefix: SetupAgent.SETUP_NEEDED_MESSAGE },
+				description,
+				extensionId: nullExtensionDescription.identifier,
+				extensionVersion: undefined,
+				extensionDisplayName: nullExtensionDescription.name,
+				extensionPublisherId: nullExtensionDescription.publisher,
+			})
+		);
 
-		const agent = disposables.add(instantiationService.createInstance(SetupAgent, context, controller, location));
+		const agent = disposables.add(
+			instantiationService.createInstance(
+				SetupAgent,
+				context,
+				controller,
+				location
+			)
+		);
 		disposables.add(chatAgentService.registerAgentImplementation(id, agent));
 		if (mode === ChatModeKind.Agent) {
 			chatAgentService.updateAgent(id, { themeIcon: Codicon.tools });
@@ -201,8 +386,15 @@ class SetupAgent extends Disposable implements IChatAgentImplementation {
 		return { agent, disposable: disposables };
 	}
 
-	private static readonly SETUP_NEEDED_MESSAGE = new MarkdownString(localize('settingUpCopilotNeeded', "You need to set up Copilot and be signed in to use Chat."));
-	private static readonly TRUST_NEEDED_MESSAGE = new MarkdownString(localize('trustNeeded', "You need to trust this workspace to use Chat."));
+	private static readonly SETUP_NEEDED_MESSAGE = new MarkdownString(
+		localize(
+			"settingUpCopilotNeeded",
+			"You need to set up Copilot and be signed in to use Chat."
+		)
+	);
+	private static readonly TRUST_NEEDED_MESSAGE = new MarkdownString(
+		localize("trustNeeded", "You need to trust this workspace to use Chat.")
+	);
 
 	private readonly _onUnresolvableError = this._register(new Emitter<void>());
 	readonly onUnresolvableError = this._onUnresolvableError.event;
@@ -213,71 +405,183 @@ class SetupAgent extends Disposable implements IChatAgentImplementation {
 		private readonly context: ChatEntitlementContext,
 		private readonly controller: Lazy<ChatSetupController>,
 		private readonly location: ChatAgentLocation,
-		@IInstantiationService private readonly instantiationService: IInstantiationService,
+		@IInstantiationService
+		private readonly instantiationService: IInstantiationService,
 		@ILogService private readonly logService: ILogService,
-		@IConfigurationService private readonly configurationService: IConfigurationService,
+		@IConfigurationService
+		private readonly configurationService: IConfigurationService,
 		@ITelemetryService private readonly telemetryService: ITelemetryService,
-		@IWorkbenchEnvironmentService private readonly environmentService: IWorkbenchEnvironmentService,
-		@IWorkspaceTrustManagementService private readonly workspaceTrustManagementService: IWorkspaceTrustManagementService
+		@IWorkbenchEnvironmentService
+		private readonly environmentService: IWorkbenchEnvironmentService,
+		@IWorkspaceTrustManagementService
+		private readonly workspaceTrustManagementService: IWorkspaceTrustManagementService
 	) {
 		super();
 	}
 
-	async invoke(request: IChatAgentRequest, progress: (parts: IChatProgress[]) => void): Promise<IChatAgentResult> {
-		return this.instantiationService.invokeFunction(async accessor /* using accessor for lazy loading */ => {
-			const chatService = accessor.get(IChatService);
-			const languageModelsService = accessor.get(ILanguageModelsService);
-			const chatWidgetService = accessor.get(IChatWidgetService);
-			const chatAgentService = accessor.get(IChatAgentService);
-			const languageModelToolsService = accessor.get(ILanguageModelToolsService);
+	async invoke(
+		request: IChatAgentRequest,
+		progress: (parts: IChatProgress[]) => void
+	): Promise<IChatAgentResult> {
+		return this.instantiationService.invokeFunction(
+			async (accessor) /* using accessor for lazy loading */ => {
+				const chatService = accessor.get(IChatService);
+				const languageModelsService = accessor.get(ILanguageModelsService);
+				const chatWidgetService = accessor.get(IChatWidgetService);
+				const chatAgentService = accessor.get(IChatAgentService);
+				const languageModelToolsService = accessor.get(
+					ILanguageModelToolsService
+				);
 
-			return this.doInvoke(request, part => progress([part]), chatService, languageModelsService, chatWidgetService, chatAgentService, languageModelToolsService);
-		});
+				return this.doInvoke(
+					request,
+					(part) => progress([part]),
+					chatService,
+					languageModelsService,
+					chatWidgetService,
+					chatAgentService,
+					languageModelToolsService
+				);
+			}
+		);
 	}
 
-	private async doInvoke(request: IChatAgentRequest, progress: (part: IChatProgress) => void, chatService: IChatService, languageModelsService: ILanguageModelsService, chatWidgetService: IChatWidgetService, chatAgentService: IChatAgentService, languageModelToolsService: ILanguageModelToolsService): Promise<IChatAgentResult> {
-		if (!this.context.state.installed || this.context.state.disabled || this.context.state.untrusted || this.context.state.entitlement === ChatEntitlement.Available || this.context.state.entitlement === ChatEntitlement.Unknown) {
-			return this.doInvokeWithSetup(request, progress, chatService, languageModelsService, chatWidgetService, chatAgentService, languageModelToolsService);
+	private async doInvoke(
+		request: IChatAgentRequest,
+		progress: (part: IChatProgress) => void,
+		chatService: IChatService,
+		languageModelsService: ILanguageModelsService,
+		chatWidgetService: IChatWidgetService,
+		chatAgentService: IChatAgentService,
+		languageModelToolsService: ILanguageModelToolsService
+	): Promise<IChatAgentResult> {
+		if (
+			!this.context.state.installed ||
+			this.context.state.disabled ||
+			this.context.state.untrusted ||
+			this.context.state.entitlement === ChatEntitlement.Available ||
+			this.context.state.entitlement === ChatEntitlement.Unknown
+		) {
+			return this.doInvokeWithSetup(
+				request,
+				progress,
+				chatService,
+				languageModelsService,
+				chatWidgetService,
+				chatAgentService,
+				languageModelToolsService
+			);
 		}
 
-		return this.doInvokeWithoutSetup(request, progress, chatService, languageModelsService, chatWidgetService, chatAgentService, languageModelToolsService);
+		return this.doInvokeWithoutSetup(
+			request,
+			progress,
+			chatService,
+			languageModelsService,
+			chatWidgetService,
+			chatAgentService,
+			languageModelToolsService
+		);
 	}
 
-	private async doInvokeWithoutSetup(request: IChatAgentRequest, progress: (part: IChatProgress) => void, chatService: IChatService, languageModelsService: ILanguageModelsService, chatWidgetService: IChatWidgetService, chatAgentService: IChatAgentService, languageModelToolsService: ILanguageModelToolsService): Promise<IChatAgentResult> {
-		const requestModel = chatWidgetService.getWidgetBySessionId(request.sessionId)?.viewModel?.model.getRequests().at(-1);
+	private async doInvokeWithoutSetup(
+		request: IChatAgentRequest,
+		progress: (part: IChatProgress) => void,
+		chatService: IChatService,
+		languageModelsService: ILanguageModelsService,
+		chatWidgetService: IChatWidgetService,
+		chatAgentService: IChatAgentService,
+		languageModelToolsService: ILanguageModelToolsService
+	): Promise<IChatAgentResult> {
+		const requestModel = chatWidgetService
+			.getWidgetBySessionId(request.sessionId)
+			?.viewModel?.model.getRequests()
+			.at(-1);
 		if (!requestModel) {
-			this.logService.error('[chat setup] Request model not found, cannot redispatch request.');
+			this.logService.error(
+				"[chat setup] Request model not found, cannot redispatch request."
+			);
 			return {}; // this should not happen
 		}
 
 		progress({
-			kind: 'progressMessage',
-			content: new MarkdownString(localize('waitingCopilot', "Getting Copilot ready")),
+			kind: "progressMessage",
+			content: new MarkdownString(
+				localize("waitingCopilot", "Getting Copilot ready")
+			),
 		});
 
-		await this.forwardRequestToCopilot(requestModel, progress, chatService, languageModelsService, chatAgentService, chatWidgetService, languageModelToolsService);
+		await this.forwardRequestToCopilot(
+			requestModel,
+			progress,
+			chatService,
+			languageModelsService,
+			chatAgentService,
+			chatWidgetService,
+			languageModelToolsService
+		);
 
 		return {};
 	}
 
-	private async forwardRequestToCopilot(requestModel: IChatRequestModel, progress: (part: IChatProgress) => void, chatService: IChatService, languageModelsService: ILanguageModelsService, chatAgentService: IChatAgentService, chatWidgetService: IChatWidgetService, languageModelToolsService: ILanguageModelToolsService): Promise<void> {
+	private async forwardRequestToCopilot(
+		requestModel: IChatRequestModel,
+		progress: (part: IChatProgress) => void,
+		chatService: IChatService,
+		languageModelsService: ILanguageModelsService,
+		chatAgentService: IChatAgentService,
+		chatWidgetService: IChatWidgetService,
+		languageModelToolsService: ILanguageModelToolsService
+	): Promise<void> {
 		try {
-			await this.doForwardRequestToCopilot(requestModel, progress, chatService, languageModelsService, chatAgentService, chatWidgetService, languageModelToolsService);
+			await this.doForwardRequestToCopilot(
+				requestModel,
+				progress,
+				chatService,
+				languageModelsService,
+				chatAgentService,
+				chatWidgetService,
+				languageModelToolsService
+			);
 		} catch (error) {
 			progress({
-				kind: 'warning',
-				content: new MarkdownString(localize('copilotUnavailableWarning', "Copilot failed to get a response. Please try again."))
+				kind: "warning",
+				content: new MarkdownString(
+					localize(
+						"copilotUnavailableWarning",
+						"Copilot failed to get a response. Please try again."
+					)
+				),
 			});
 		}
 	}
 
-	private async doForwardRequestToCopilot(requestModel: IChatRequestModel, progress: (part: IChatProgress) => void, chatService: IChatService, languageModelsService: ILanguageModelsService, chatAgentService: IChatAgentService, chatWidgetService: IChatWidgetService, languageModelToolsService: ILanguageModelToolsService): Promise<void> {
+	private async doForwardRequestToCopilot(
+		requestModel: IChatRequestModel,
+		progress: (part: IChatProgress) => void,
+		chatService: IChatService,
+		languageModelsService: ILanguageModelsService,
+		chatAgentService: IChatAgentService,
+		chatWidgetService: IChatWidgetService,
+		languageModelToolsService: ILanguageModelToolsService
+	): Promise<void> {
 		if (this.pendingForwardedRequests.has(requestModel.session.sessionId)) {
-			throw new Error('Request already in progress');
+			throw new Error("Request already in progress");
 		}
 
-		const forwardRequest = this.doForwardRequestToCopilotWhenReady(requestModel, progress, chatService, languageModelsService, chatAgentService, chatWidgetService, languageModelToolsService);
-		this.pendingForwardedRequests.set(requestModel.session.sessionId, forwardRequest);
+		const forwardRequest = this.doForwardRequestToCopilotWhenReady(
+			requestModel,
+			progress,
+			chatService,
+			languageModelsService,
+			chatAgentService,
+			chatWidgetService,
+			languageModelToolsService
+		);
+		this.pendingForwardedRequests.set(
+			requestModel.session.sessionId,
+			forwardRequest
+		);
 
 		try {
 			await forwardRequest;
@@ -286,8 +590,18 @@ class SetupAgent extends Disposable implements IChatAgentImplementation {
 		}
 	}
 
-	private async doForwardRequestToCopilotWhenReady(requestModel: IChatRequestModel, progress: (part: IChatProgress) => void, chatService: IChatService, languageModelsService: ILanguageModelsService, chatAgentService: IChatAgentService, chatWidgetService: IChatWidgetService, languageModelToolsService: ILanguageModelToolsService): Promise<void> {
-		const widget = chatWidgetService.getWidgetBySessionId(requestModel.session.sessionId);
+	private async doForwardRequestToCopilotWhenReady(
+		requestModel: IChatRequestModel,
+		progress: (part: IChatProgress) => void,
+		chatService: IChatService,
+		languageModelsService: ILanguageModelsService,
+		chatAgentService: IChatAgentService,
+		chatWidgetService: IChatWidgetService,
+		languageModelToolsService: ILanguageModelToolsService
+	): Promise<void> {
+		const widget = chatWidgetService.getWidgetBySessionId(
+			requestModel.session.sessionId
+		);
 		const modeInfo = widget?.input.currentModeInfo;
 		const languageModel = widget?.input.currentLanguageModel;
 
@@ -299,42 +613,76 @@ class SetupAgent extends Disposable implements IChatAgentImplementation {
 		let languageModelReady = false;
 		let toolsModelReady = false;
 
-		const whenAgentReady = this.whenAgentReady(chatAgentService, modeInfo?.kind)?.then(() => agentReady = true);
-		const whenLanguageModelReady = this.whenLanguageModelReady(languageModelsService)?.then(() => languageModelReady = true);
-		const whenToolsModelReady = this.whenToolsModelReady(languageModelToolsService, requestModel)?.then(() => toolsModelReady = true);
+		const whenAgentReady = this.whenAgentReady(
+			chatAgentService,
+			modeInfo?.kind
+		)?.then(() => (agentReady = true));
+		const whenLanguageModelReady = this.whenLanguageModelReady(
+			languageModelsService
+		)?.then(() => (languageModelReady = true));
+		const whenToolsModelReady = this.whenToolsModelReady(
+			languageModelToolsService,
+			requestModel
+		)?.then(() => (toolsModelReady = true));
 
-		if (whenLanguageModelReady instanceof Promise || whenAgentReady instanceof Promise || whenToolsModelReady instanceof Promise) {
+		if (
+			whenLanguageModelReady instanceof Promise ||
+			whenAgentReady instanceof Promise ||
+			whenToolsModelReady instanceof Promise
+		) {
 			const timeoutHandle = setTimeout(() => {
 				progress({
-					kind: 'progressMessage',
-					content: new MarkdownString(localize('waitingCopilot2', "Copilot is almost ready")),
+					kind: "progressMessage",
+					content: new MarkdownString(
+						localize("waitingCopilot2", "Copilot is almost ready")
+					),
 				});
 			}, 10000);
 
 			try {
 				const ready = await Promise.race([
-					timeout(this.environmentService.remoteAuthority ? 60000 /* increase for remote scenarios */ : 20000).then(() => 'timedout'),
-					this.whenDefaultAgentFailed(chatService).then(() => 'error'),
-					Promise.allSettled([whenLanguageModelReady, whenAgentReady, whenToolsModelReady])
+					timeout(
+						this.environmentService.remoteAuthority
+							? 60000 /* increase for remote scenarios */
+							: 20000
+					).then(() => "timedout"),
+					this.whenDefaultAgentFailed(chatService).then(() => "error"),
+					Promise.allSettled([
+						whenLanguageModelReady,
+						whenAgentReady,
+						whenToolsModelReady,
+					]),
 				]);
 
-				if (ready === 'error' || ready === 'timedout') {
+				if (ready === "error" || ready === "timedout") {
 					let warningMessage: string;
-					if (ready === 'timedout') {
-						warningMessage = localize('copilotTookLongWarning', "Copilot took too long to get ready. Please ensure you are signed in to {0} and that the extension `{1}` is installed and enabled.", defaultChat.provider.default.name, defaultChat.chatExtensionId);
+					if (ready === "timedout") {
+						warningMessage = localize(
+							"copilotTookLongWarning",
+							"Copilot took too long to get ready. Please ensure you are signed in to {0} and that the extension `{1}` is installed and enabled.",
+							defaultChat.provider.default.name,
+							defaultChat.chatExtensionId
+						);
 					} else {
-						warningMessage = localize('copilotFailedWarning', "Copilot failed to get ready. Please ensure you are signed in to {0} and that the extension `{1}` is installed and enabled.", defaultChat.provider.default.name, defaultChat.chatExtensionId);
+						warningMessage = localize(
+							"copilotFailedWarning",
+							"Copilot failed to get ready. Please ensure you are signed in to {0} and that the extension `{1}` is installed and enabled.",
+							defaultChat.provider.default.name,
+							defaultChat.chatExtensionId
+						);
 					}
 
 					this.logService.warn(warningMessage, {
 						agentReady: whenAgentReady ? agentReady : undefined,
-						languageModelReady: whenLanguageModelReady ? languageModelReady : undefined,
-						toolsModelReady: whenToolsModelReady ? toolsModelReady : undefined
+						languageModelReady: whenLanguageModelReady
+							? languageModelReady
+							: undefined,
+						toolsModelReady: whenToolsModelReady ? toolsModelReady : undefined,
 					});
 
 					progress({
-						kind: 'warning',
-						content: new MarkdownString(warningMessage)
+						kind: "warning",
+						content: new MarkdownString(warningMessage),
 					});
 
 					// This means Copilot is unhealthy and we cannot retry the
@@ -354,7 +702,9 @@ class SetupAgent extends Disposable implements IChatAgentImplementation {
 		});
 	}
 
-	private whenLanguageModelReady(languageModelsService: ILanguageModelsService): Promise<unknown> | void {
+	private whenLanguageModelReady(
+		languageModelsService: ILanguageModelsService
+	): Promise<unknown> | void {
 		const hasDefaultModel = () => {
 			for (const id of languageModelsService.getLanguageModelIds()) {
 				const model = languageModelsService.lookupLanguageModel(id);
@@ -368,98 +718,167 @@ class SetupAgent extends Disposable implements IChatAgentImplementation {
 			return; // we have language models!
 		}
 
-		return Event.toPromise(Event.filter(languageModelsService.onDidChangeLanguageModels, () => hasDefaultModel() ?? false));
+		return Event.toPromise(
+			Event.filter(
+				languageModelsService.onDidChangeLanguageModels,
+				() => hasDefaultModel() ?? false
+			)
+		);
 	}
 
-	private whenToolsModelReady(languageModelToolsService: ILanguageModelToolsService, requestModel: IChatRequestModel): Promise<unknown> | void {
-		const needsToolsModel = requestModel.message.parts.some(part => part instanceof ChatRequestToolPart);
+	private whenToolsModelReady(
+		languageModelToolsService: ILanguageModelToolsService,
+		requestModel: IChatRequestModel
+	): Promise<unknown> | void {
+		const needsToolsModel = requestModel.message.parts.some(
+			(part) => part instanceof ChatRequestToolPart
+		);
 		if (!needsToolsModel) {
 			return; // No tools in this request, no need to check
 		}
 
 		// check that tools other than setup. and internal tools are registered.
 		for (const tool of languageModelToolsService.getTools()) {
-			if (tool.id.startsWith('copilot_')) {
+			if (tool.id.startsWith("copilot_")) {
 				return; // we have tools!
 			}
 		}
 
-		return Event.toPromise(Event.filter(languageModelToolsService.onDidChangeTools, () => {
-			for (const tool of languageModelToolsService.getTools()) {
-				if (tool.id.startsWith('copilot_')) {
-					return true; // we have tools!
+		return Event.toPromise(
+			Event.filter(languageModelToolsService.onDidChangeTools, () => {
+				for (const tool of languageModelToolsService.getTools()) {
+					if (tool.id.startsWith("copilot_")) {
+						return true; // we have tools!
+					}
 				}
-			}
 
-			return false; // no external tools found
-		}));
+				return false; // no external tools found
+			})
+		);
 	}
 
-	private whenAgentReady(chatAgentService: IChatAgentService, mode: ChatModeKind | undefined): Promise<unknown> | void {
+	private whenAgentReady(
+		chatAgentService: IChatAgentService,
+		mode: ChatModeKind | undefined
+	): Promise<unknown> | void {
 		const defaultAgent = chatAgentService.getDefaultAgent(this.location, mode);
 		if (defaultAgent && !defaultAgent.isCore) {
 			return; // we have a default agent from an extension!
 		}
 
-		return Event.toPromise(Event.filter(chatAgentService.onDidChangeAgents, () => {
-			const defaultAgent = chatAgentService.getDefaultAgent(this.location, mode);
-			return Boolean(defaultAgent && !defaultAgent.isCore);
-		}));
+		return Event.toPromise(
+			Event.filter(chatAgentService.onDidChangeAgents, () => {
+				const defaultAgent = chatAgentService.getDefaultAgent(
+					this.location,
+					mode
+				);
+				return Boolean(defaultAgent && !defaultAgent.isCore);
+			})
+		);
 	}
 
-	private async whenDefaultAgentFailed(chatService: IChatService): Promise<void> {
-		return new Promise<void>(resolve => {
+	private async whenDefaultAgentFailed(
+		chatService: IChatService
+	): Promise<void> {
+		return new Promise<void>((resolve) => {
 			chatService.activateDefaultAgent(this.location).catch(() => resolve());
 		});
 	}
 
-	private async doInvokeWithSetup(request: IChatAgentRequest, progress: (part: IChatProgress) => void, chatService: IChatService, languageModelsService: ILanguageModelsService, chatWidgetService: IChatWidgetService, chatAgentService: IChatAgentService, languageModelToolsService: ILanguageModelToolsService): Promise<IChatAgentResult> {
-		this.telemetryService.publicLog2<WorkbenchActionExecutedEvent, WorkbenchActionExecutedClassification>('workbenchActionExecuted', { id: CHAT_SETUP_ACTION_ID, from: 'chat' });
+	private async doInvokeWithSetup(
+		request: IChatAgentRequest,
+		progress: (part: IChatProgress) => void,
+		chatService: IChatService,
+		languageModelsService: ILanguageModelsService,
+		chatWidgetService: IChatWidgetService,
+		chatAgentService: IChatAgentService,
+		languageModelToolsService: ILanguageModelToolsService
+	): Promise<IChatAgentResult> {
+		this.telemetryService.publicLog2<
+			WorkbenchActionExecutedEvent,
+			WorkbenchActionExecutedClassification
+		>("workbenchActionExecuted", { id: CHAT_SETUP_ACTION_ID, from: "chat" });
 
 		const widget = chatWidgetService.getWidgetBySessionId(request.sessionId);
 		const requestModel = widget?.viewModel?.model.getRequests().at(-1);
 
-		const setupListener = Event.runAndSubscribe(this.controller.value.onDidChange, (() => {
-			switch (this.controller.value.step) {
-				case ChatSetupStep.SigningIn:
-					progress({
-						kind: 'progressMessage',
-						content: new MarkdownString(localize('setupChatSignIn2', "Signing in to {0}.", ChatEntitlementRequests.providerId(this.configurationService) === defaultChat.provider.enterprise.id ? defaultChat.provider.enterprise.name : defaultChat.provider.default.name)),
-					});
-					break;
-				case ChatSetupStep.Installing:
-					progress({
-						kind: 'progressMessage',
-						content: new MarkdownString(localize('installingCopilot', "Getting Copilot ready")),
-					});
-					break;
+		const setupListener = Event.runAndSubscribe(
+			this.controller.value.onDidChange,
+			() => {
+				switch (this.controller.value.step) {
+					case ChatSetupStep.SigningIn:
+						progress({
+							kind: "progressMessage",
+							content: new MarkdownString(
+								localize(
+									"setupChatSignIn2",
+									"Signing in to {0}.",
+									ChatEntitlementRequests.providerId(
+										this.configurationService
+									) === defaultChat.provider.enterprise.id
+										? defaultChat.provider.enterprise.name
+										: defaultChat.provider.default.name
+								)
+							),
+						});
+						break;
+					case ChatSetupStep.Installing:
+						progress({
+							kind: "progressMessage",
+							content: new MarkdownString(
+								localize("installingCopilot", "Getting Copilot ready")
+							),
+						});
+						break;
+				}
 			}
-		}));
+		);
 
 		let result: IChatSetupResult | undefined = undefined;
 		try {
-			result = await ChatSetup.getInstance(this.instantiationService, this.context, this.controller).run({ disableChatViewReveal: true /* we are already in a chat context */ });
+			result = await ChatSetup.getInstance(
+				this.instantiationService,
+				this.context,
+				this.controller
+			).run({
+				disableChatViewReveal: true /* we are already in a chat context */,
+			});
 		} catch (error) {
-			this.logService.error(`[chat setup] Error during setup: ${toErrorMessage(error)}`);
+			this.logService.error(
+				`[chat setup] Error during setup: ${toErrorMessage(error)}`
+			);
 		} finally {
 			setupListener.dispose();
 		}
 
 		// User has agreed to run the setup
-		if (typeof result?.success === 'boolean') {
+		if (typeof result?.success === "boolean") {
 			if (result.success) {
 				if (result.dialogSkipped) {
 					widget?.clear(); // make room for the Chat welcome experience
 				} else if (requestModel) {
-					let newRequest = this.replaceAgentInRequestModel(requestModel, chatAgentService); 	// Replace agent part with the actual Copilot agent...
-					newRequest = this.replaceToolInRequestModel(newRequest); 							// ...then replace any tool parts with the actual Copilot tools
+					let newRequest = this.replaceAgentInRequestModel(
+						requestModel,
+						chatAgentService
+					); // Replace agent part with the actual Copilot agent...
+					newRequest = this.replaceToolInRequestModel(newRequest); // ...then replace any tool parts with the actual Copilot tools
 
-					await this.forwardRequestToCopilot(newRequest, progress, chatService, languageModelsService, chatAgentService, chatWidgetService, languageModelToolsService);
+					await this.forwardRequestToCopilot(
+						newRequest,
+						progress,
+						chatService,
+						languageModelsService,
+						chatAgentService,
+						chatWidgetService,
+						languageModelToolsService
+					);
 				}
 			} else {
 				progress({
-					kind: 'warning',
-					content: new MarkdownString(localize('copilotSetupError', "Copilot setup failed."))
+					kind: "warning",
+					content: new MarkdownString(
+						localize("copilotSetupError", "Copilot setup failed.")
+					),
 				});
 			}
 		}
@@ -467,38 +886,52 @@ class SetupAgent extends Disposable implements IChatAgentImplementation {
 		// User has cancelled the setup
 		else {
 			progress({
-				kind: 'markdownContent',
-				content: this.workspaceTrustManagementService.isWorkspaceTrusted() ? SetupAgent.SETUP_NEEDED_MESSAGE : SetupAgent.TRUST_NEEDED_MESSAGE
+				kind: "markdownContent",
+				content: this.workspaceTrustManagementService.isWorkspaceTrusted()
+					? SetupAgent.SETUP_NEEDED_MESSAGE
+					: SetupAgent.TRUST_NEEDED_MESSAGE,
 			});
 		}
 
 		return {};
 	}
 
-	private replaceAgentInRequestModel(requestModel: IChatRequestModel, chatAgentService: IChatAgentService): IChatRequestModel {
-		const agentPart = requestModel.message.parts.find((r): r is ChatRequestAgentPart => r instanceof ChatRequestAgentPart);
+	private replaceAgentInRequestModel(
+		requestModel: IChatRequestModel,
+		chatAgentService: IChatAgentService
+	): IChatRequestModel {
+		const agentPart = requestModel.message.parts.find(
+			(r): r is ChatRequestAgentPart => r instanceof ChatRequestAgentPart
+		);
 		if (!agentPart) {
 			return requestModel;
 		}
 
-		const agentId = agentPart.agent.id.replace(/setup\./, `${defaultChat.extensionId}.`.toLowerCase());
+		const agentId = agentPart.agent.id.replace(
+			/setup\./,
+			`${defaultChat.extensionId}.`.toLowerCase()
+		);
 		const githubAgent = chatAgentService.getAgent(agentId);
 		if (!githubAgent) {
 			return requestModel;
 		}
 
-		const newAgentPart = new ChatRequestAgentPart(agentPart.range, agentPart.editorRange, githubAgent);
+		const newAgentPart = new ChatRequestAgentPart(
+			agentPart.range,
+			agentPart.editorRange,
+			githubAgent
+		);
 
 		return new ChatRequestModel({
 			session: requestModel.session as ChatModel,
 			message: {
-				parts: requestModel.message.parts.map(part => {
+				parts: requestModel.message.parts.map((part) => {
 					if (part instanceof ChatRequestAgentPart) {
 						return newAgentPart;
 					}
 					return part;
 				}),
-				text: requestModel.message.text
+				text: requestModel.message.text,
 			},
 			variableData: requestModel.variableData,
 			timestamp: Date.now(),
@@ -511,13 +944,20 @@ class SetupAgent extends Disposable implements IChatAgentImplementation {
 		});
 	}
 
-	private replaceToolInRequestModel(requestModel: IChatRequestModel): IChatRequestModel {
-		const toolPart = requestModel.message.parts.find((r): r is ChatRequestToolPart => r instanceof ChatRequestToolPart);
+	private replaceToolInRequestModel(
+		requestModel: IChatRequestModel
+	): IChatRequestModel {
+		const toolPart = requestModel.message.parts.find(
+			(r): r is ChatRequestToolPart => r instanceof ChatRequestToolPart
+		);
 		if (!toolPart) {
 			return requestModel;
 		}
 
-		const toolId = toolPart.toolId.replace(/setup.tools\./, `copilot_`.toLowerCase());
+		const toolId = toolPart.toolId.replace(
+			/setup.tools\./,
+			`copilot_`.toLowerCase()
+		);
 		const newToolPart = new ChatRequestToolPart(
 			toolPart.range,
 			toolPart.editorRange,
@@ -529,26 +969,26 @@ class SetupAgent extends Disposable implements IChatAgentImplementation {
 
 		const chatRequestToolEntry: IChatRequestToolEntry = {
 			id: toolId,
-			name: 'new',
+			name: "new",
 			range: toolPart.range,
-			kind: 'tool',
-			value: undefined
+			kind: "tool",
+			value: undefined,
 		};
 
 		const variableData: IChatRequestVariableData = {
-			variables: [chatRequestToolEntry]
+			variables: [chatRequestToolEntry],
 		};
 
 		return new ChatRequestModel({
 			session: requestModel.session as ChatModel,
 			message: {
-				parts: requestModel.message.parts.map(part => {
+				parts: requestModel.message.parts.map((part) => {
 					if (part instanceof ChatRequestToolPart) {
 						return newToolPart;
 					}
 					return part;
 				}),
-				text: requestModel.message.text
+				text: requestModel.message.text,
 			},
 			variableData: variableData,
 			timestamp: Date.now(),
@@ -562,11 +1002,12 @@ class SetupAgent extends Disposable implements IChatAgentImplementation {
 	}
 }
 
-
 class SetupTool extends Disposable implements IToolImpl {
-
-	static registerTool(instantiationService: IInstantiationService, toolData: IToolData): { tool: SetupTool; disposable: IDisposable } {
-		return instantiationService.invokeFunction(accessor => {
+	static registerTool(
+		instantiationService: IInstantiationService,
+		toolData: IToolData
+	): { tool: SetupTool; disposable: IDisposable } {
+		return instantiationService.invokeFunction((accessor) => {
 			const toolService = accessor.get(ILanguageModelToolsService);
 
 			const disposables = new DisposableStore();
@@ -578,20 +1019,28 @@ class SetupTool extends Disposable implements IToolImpl {
 		});
 	}
 
-	async invoke(invocation: IToolInvocation, countTokens: CountTokensCallback, progress: ToolProgress, token: CancellationToken): Promise<IToolResult> {
+	async invoke(
+		invocation: IToolInvocation,
+		countTokens: CountTokensCallback,
+		progress: ToolProgress,
+		token: CancellationToken
+	): Promise<IToolResult> {
 		const result: IToolResult = {
 			content: [
 				{
-					kind: 'text',
-					value: ''
-				}
-			]
+					kind: "text",
+					value: "",
+				},
+			],
 		};
 
 		return result;
 	}
 
-	async prepareToolInvocation?(parameters: any, token: CancellationToken): Promise<IPreparedToolInvocation | undefined> {
+	async prepareToolInvocation?(
+		parameters: any,
+		token: CancellationToken
+	): Promise<IPreparedToolInvocation | undefined> {
 		return undefined;
 	}
 }
@@ -602,7 +1051,7 @@ enum ChatSetupStrategy {
 	SetupWithoutEnterpriseProvider = 2,
 	SetupWithEnterpriseProvider = 3,
 	SetupWithGoogleProvider = 4,
-	SetupWithAppleProvider = 5
+	SetupWithAppleProvider = 5,
 }
 
 type ChatSetupResultValue = boolean /* success */ | undefined /* canceled */;
@@ -613,14 +1062,31 @@ interface IChatSetupResult {
 }
 
 class ChatSetup {
-
 	private static instance: ChatSetup | undefined = undefined;
-	static getInstance(instantiationService: IInstantiationService, context: ChatEntitlementContext, controller: Lazy<ChatSetupController>): ChatSetup {
+	static getInstance(
+		instantiationService: IInstantiationService,
+		context: ChatEntitlementContext,
+		controller: Lazy<ChatSetupController>
+	): ChatSetup {
 		let instance = ChatSetup.instance;
 		if (!instance) {
-			instance = ChatSetup.instance = instantiationService.invokeFunction(accessor => {
-				return new ChatSetup(context, controller, instantiationService, accessor.get(ITelemetryService), accessor.get(IWorkbenchLayoutService), accessor.get(IKeybindingService), accessor.get(IChatEntitlementService) as ChatEntitlementService, accessor.get(ILogService), accessor.get(IConfigurationService), accessor.get(IViewsService), accessor.get(IWorkspaceTrustRequestService));
-			});
+			instance = ChatSetup.instance = instantiationService.invokeFunction(
+				(accessor) => {
+					return new ChatSetup(
+						context,
+						controller,
+						instantiationService,
+						accessor.get(ITelemetryService),
+						accessor.get(IWorkbenchLayoutService),
+						accessor.get(IKeybindingService),
+						accessor.get(IChatEntitlementService) as ChatEntitlementService,
+						accessor.get(ILogService),
+						accessor.get(IConfigurationService),
+						accessor.get(IViewsService),
+						accessor.get(IWorkspaceTrustRequestService)
+					);
+				}
+			);
 		}
 
 		return instance;
@@ -633,22 +1099,30 @@ class ChatSetup {
 	private constructor(
 		private readonly context: ChatEntitlementContext,
 		private readonly controller: Lazy<ChatSetupController>,
-		@IInstantiationService private readonly instantiationService: IInstantiationService,
+		@IInstantiationService
+		private readonly instantiationService: IInstantiationService,
 		@ITelemetryService private readonly telemetryService: ITelemetryService,
 		@ILayoutService private readonly layoutService: IWorkbenchLayoutService,
 		@IKeybindingService private readonly keybindingService: IKeybindingService,
-		@IChatEntitlementService private readonly chatEntitlementService: ChatEntitlementService,
+		@IChatEntitlementService
+		private readonly chatEntitlementService: ChatEntitlementService,
 		@ILogService private readonly logService: ILogService,
-		@IConfigurationService private readonly configurationService: IConfigurationService,
+		@IConfigurationService
+		private readonly configurationService: IConfigurationService,
 		@IViewsService private readonly viewsService: IViewsService,
-		@IWorkspaceTrustRequestService private readonly workspaceTrustRequestService: IWorkspaceTrustRequestService
-	) { }
+		@IWorkspaceTrustRequestService
+		private readonly workspaceTrustRequestService: IWorkspaceTrustRequestService
+	) {}
 
 	skipDialog(): void {
 		this.skipDialogOnce = true;
 	}
 
-	async run(options?: { disableChatViewReveal?: boolean; forceSignInDialog?: boolean; additionalScopes?: readonly string[] }): Promise<IChatSetupResult> {
+	async run(options?: {
+		disableChatViewReveal?: boolean;
+		forceSignInDialog?: boolean;
+		additionalScopes?: readonly string[];
+	}): Promise<IChatSetupResult> {
 		if (this.pendingRun) {
 			return this.pendingRun;
 		}
@@ -662,34 +1136,62 @@ class ChatSetup {
 		}
 	}
 
-	private async doRun(options?: { disableChatViewReveal?: boolean; forceSignInDialog?: boolean; additionalScopes?: readonly string[] }): Promise<IChatSetupResult> {
+	private async doRun(options?: {
+		disableChatViewReveal?: boolean;
+		forceSignInDialog?: boolean;
+		additionalScopes?: readonly string[];
+	}): Promise<IChatSetupResult> {
 		this.context.update({ later: false });
 
 		const dialogSkipped = this.skipDialogOnce;
 		this.skipDialogOnce = false;
 
-		const trusted = await this.workspaceTrustRequestService.requestWorkspaceTrust({
-			message: localize('copilotWorkspaceTrust', "Copilot is currently only supported in trusted workspaces.")
-		});
+		const trusted =
+			await this.workspaceTrustRequestService.requestWorkspaceTrust({
+				message: localize(
+					"copilotWorkspaceTrust",
+					"Copilot is currently only supported in trusted workspaces."
+				),
+			});
 		if (!trusted) {
 			this.context.update({ later: true });
-			this.telemetryService.publicLog2<InstallChatEvent, InstallChatClassification>('commandCenter.chatInstall', { installResult: 'failedNotTrusted', installDuration: 0, signUpErrorCode: undefined, provider: undefined });
+			this.telemetryService.publicLog2<
+				InstallChatEvent,
+				InstallChatClassification
+			>("commandCenter.chatInstall", {
+				installResult: "failedNotTrusted",
+				installDuration: 0,
+				signUpErrorCode: undefined,
+				provider: undefined,
+			});
 
 			return { dialogSkipped, success: undefined /* canceled */ };
 		}
 
 		let setupStrategy: ChatSetupStrategy;
-		if (!options?.forceSignInDialog && (dialogSkipped || isProUser(this.chatEntitlementService.entitlement) || this.chatEntitlementService.entitlement === ChatEntitlement.Free)) {
+		if (
+			!options?.forceSignInDialog &&
+			(dialogSkipped ||
+				isProUser(this.chatEntitlementService.entitlement) ||
+				this.chatEntitlementService.entitlement === ChatEntitlement.Free)
+		) {
 			setupStrategy = ChatSetupStrategy.DefaultSetup; // existing pro/free users setup without a dialog
 		} else {
 			setupStrategy = await this.showDialog(options);
 		}
 
-		if (setupStrategy === ChatSetupStrategy.DefaultSetup && ChatEntitlementRequests.providerId(this.configurationService) === defaultChat.provider.enterprise.id) {
+		if (
+			setupStrategy === ChatSetupStrategy.DefaultSetup &&
+			ChatEntitlementRequests.providerId(this.configurationService) ===
+				defaultChat.provider.enterprise.id
+		) {
 			setupStrategy = ChatSetupStrategy.SetupWithEnterpriseProvider; // users with a configured provider go through provider setup
 		}
 
-		if (setupStrategy !== ChatSetupStrategy.Canceled && !options?.disableChatViewReveal) {
+		if (
+			setupStrategy !== ChatSetupStrategy.Canceled &&
+			!options?.disableChatViewReveal
+		) {
 			// Show the chat view now to better indicate progress
 			// while installing the extension or returning from sign in
 			showCopilotView(this.viewsService, this.layoutService);
@@ -699,55 +1201,95 @@ class ChatSetup {
 		try {
 			switch (setupStrategy) {
 				case ChatSetupStrategy.SetupWithEnterpriseProvider:
-					success = await this.controller.value.setupWithProvider({ useEnterpriseProvider: true, useSocialProvider: undefined, additionalScopes: options?.additionalScopes });
+					success = await this.controller.value.setupWithProvider({
+						useEnterpriseProvider: true,
+						useSocialProvider: undefined,
+						additionalScopes: options?.additionalScopes,
+					});
 					break;
 				case ChatSetupStrategy.SetupWithoutEnterpriseProvider:
-					success = await this.controller.value.setupWithProvider({ useEnterpriseProvider: false, useSocialProvider: undefined, additionalScopes: options?.additionalScopes });
+					success = await this.controller.value.setupWithProvider({
+						useEnterpriseProvider: false,
+						useSocialProvider: undefined,
+						additionalScopes: options?.additionalScopes,
+					});
 					break;
 				case ChatSetupStrategy.SetupWithAppleProvider:
-					success = await this.controller.value.setupWithProvider({ useEnterpriseProvider: false, useSocialProvider: 'apple', additionalScopes: options?.additionalScopes });
+					success = await this.controller.value.setupWithProvider({
+						useEnterpriseProvider: false,
+						useSocialProvider: "apple",
+						additionalScopes: options?.additionalScopes,
+					});
 					break;
 				case ChatSetupStrategy.SetupWithGoogleProvider:
-					success = await this.controller.value.setupWithProvider({ useEnterpriseProvider: false, useSocialProvider: 'google', additionalScopes: options?.additionalScopes });
+					success = await this.controller.value.setupWithProvider({
+						useEnterpriseProvider: false,
+						useSocialProvider: "google",
+						additionalScopes: options?.additionalScopes,
+					});
 					break;
 				case ChatSetupStrategy.DefaultSetup:
 					success = await this.controller.value.setup(options);
 					break;
 				case ChatSetupStrategy.Canceled:
 					this.context.update({ later: true });
-					this.telemetryService.publicLog2<InstallChatEvent, InstallChatClassification>('commandCenter.chatInstall', { installResult: 'failedMaybeLater', installDuration: 0, signUpErrorCode: undefined, provider: undefined });
+					this.telemetryService.publicLog2<
+						InstallChatEvent,
+						InstallChatClassification
+					>("commandCenter.chatInstall", {
+						installResult: "failedMaybeLater",
+						installDuration: 0,
+						signUpErrorCode: undefined,
+						provider: undefined,
+					});
 					break;
 			}
 		} catch (error) {
-			this.logService.error(`[chat setup] Error during setup: ${toErrorMessage(error)}`);
+			this.logService.error(
+				`[chat setup] Error during setup: ${toErrorMessage(error)}`
+			);
 			success = false;
 		}
 
 		return { success, dialogSkipped };
 	}
 
-	private async showDialog(options?: { forceSignInDialog?: boolean }): Promise<ChatSetupStrategy> {
+	private async showDialog(options?: {
+		forceSignInDialog?: boolean;
+	}): Promise<ChatSetupStrategy> {
 		const disposables = new DisposableStore();
 
-		const dialogVariant = this.configurationService.getValue<'default' | 'apple' | unknown>('chat.setup.signInDialogVariant');
+		const dialogVariant = this.configurationService.getValue<
+			"default" | "apple" | unknown
+		>("chat.setup.signInDialogVariant");
 		const buttons = this.getButtons(dialogVariant, options);
 
-		const dialog = disposables.add(new Dialog(
-			this.layoutService.activeContainer,
-			this.getDialogTitle(options),
-			buttons.map(button => button[0]),
-			createWorkbenchDialogOptions({
-				type: 'none',
-				extraClasses: ['chat-setup-dialog'],
-				detail: ' ', // workaround allowing us to render the message in large
-				icon: Codicon.copilotLarge,
-				alignment: DialogContentsAlignment.Vertical,
-				cancelId: buttons.length - 1,
-				disableCloseButton: true,
-				renderFooter: this.telemetryService.telemetryLevel !== TelemetryLevel.NONE ? footer => footer.appendChild(this.createDialogFooter(disposables)) : undefined,
-				buttonOptions: buttons.map(button => button[2])
-			}, this.keybindingService, this.layoutService)
-		));
+		const dialog = disposables.add(
+			new Dialog(
+				this.layoutService.activeContainer,
+				this.getDialogTitle(options),
+				buttons.map((button) => button[0]),
+				createWorkbenchDialogOptions(
+					{
+						type: "none",
+						extraClasses: ["chat-setup-dialog"],
+						detail: " ", // workaround allowing us to render the message in large
+						icon: Codicon.copilotLarge,
+						alignment: DialogContentsAlignment.Vertical,
+						cancelId: buttons.length - 1,
+						disableCloseButton: true,
+						renderFooter:
+							this.telemetryService.telemetryLevel !== TelemetryLevel.NONE
+								? (footer) =>
+										footer.appendChild(this.createDialogFooter(disposables))
+								: undefined,
+						buttonOptions: buttons.map((button) => button[2]),
+					},
+					this.keybindingService,
+					this.layoutService
+				)
+			)
+		);
 
 		const { button } = await dialog.show();
 		disposables.dispose();
@@ -755,75 +1297,193 @@ class ChatSetup {
 		return buttons[button]?.[1] ?? ChatSetupStrategy.Canceled;
 	}
 
-	private getButtons(variant: 'default' | 'apple' | unknown, options?: { forceSignInDialog?: boolean }): Array<[string, ChatSetupStrategy, { styleButton?: (button: IButton) => void } | undefined]> {
-		type ContinueWithButton = [string, ChatSetupStrategy, { styleButton?: (button: IButton) => void } | undefined];
-		const styleButton = (...classes: string[]) => ({ styleButton: (button: IButton) => button.element.classList.add(...classes) });
+	private getButtons(
+		variant: "default" | "apple" | unknown,
+		options?: { forceSignInDialog?: boolean }
+	): Array<
+		[
+			string,
+			ChatSetupStrategy,
+			{ styleButton?: (button: IButton) => void } | undefined
+		]
+	> {
+		type ContinueWithButton = [
+			string,
+			ChatSetupStrategy,
+			{ styleButton?: (button: IButton) => void } | undefined
+		];
+		const styleButton = (...classes: string[]) => ({
+			styleButton: (button: IButton) =>
+				button.element.classList.add(...classes),
+		});
 
 		let buttons: Array<ContinueWithButton>;
-		if (this.context.state.entitlement === ChatEntitlement.Unknown || options?.forceSignInDialog) {
-			const defaultProviderButton: ContinueWithButton = [localize('continueWith', "Continue with {0}", defaultChat.provider.default.name), ChatSetupStrategy.SetupWithoutEnterpriseProvider, styleButton('continue-button', 'default')];
-			const defaultProviderLink: ContinueWithButton = [defaultProviderButton[0], defaultProviderButton[1], styleButton('link-button')];
+		if (
+			this.context.state.entitlement === ChatEntitlement.Unknown ||
+			options?.forceSignInDialog
+		) {
+			const defaultProviderButton: ContinueWithButton = [
+				localize(
+					"continueWith",
+					"Continue with {0}",
+					defaultChat.provider.default.name
+				),
+				ChatSetupStrategy.SetupWithoutEnterpriseProvider,
+				styleButton("continue-button", "default"),
+			];
+			const defaultProviderLink: ContinueWithButton = [
+				defaultProviderButton[0],
+				defaultProviderButton[1],
+				styleButton("link-button"),
+			];
 
-			const enterpriseProviderButton: ContinueWithButton = [localize('continueWith', "Continue with {0}", defaultChat.provider.enterprise.name), ChatSetupStrategy.SetupWithEnterpriseProvider, styleButton('continue-button', 'default')];
-			const enterpriseProviderLink: ContinueWithButton = [enterpriseProviderButton[0], enterpriseProviderButton[1], styleButton('link-button')];
+			const enterpriseProviderButton: ContinueWithButton = [
+				localize(
+					"continueWith",
+					"Continue with {0}",
+					defaultChat.provider.enterprise.name
+				),
+				ChatSetupStrategy.SetupWithEnterpriseProvider,
+				styleButton("continue-button", "default"),
+			];
+			const enterpriseProviderLink: ContinueWithButton = [
+				enterpriseProviderButton[0],
+				enterpriseProviderButton[1],
+				styleButton("link-button"),
+			];
 
-			const googleProviderButton: ContinueWithButton = [localize('continueWith', "Continue with {0}", defaultChat.provider.google.name), ChatSetupStrategy.SetupWithGoogleProvider, styleButton('continue-button', 'google')];
-			const appleProviderButton: ContinueWithButton = [localize('continueWith', "Continue with {0}", defaultChat.provider.apple.name), ChatSetupStrategy.SetupWithAppleProvider, styleButton('continue-button', 'apple')];
+			const googleProviderButton: ContinueWithButton = [
+				localize(
+					"continueWith",
+					"Continue with {0}",
+					defaultChat.provider.google.name
+				),
+				ChatSetupStrategy.SetupWithGoogleProvider,
+				styleButton("continue-button", "google"),
+			];
+			const appleProviderButton: ContinueWithButton = [
+				localize(
+					"continueWith",
+					"Continue with {0}",
+					defaultChat.provider.apple.name
+				),
+				ChatSetupStrategy.SetupWithAppleProvider,
+				styleButton("continue-button", "apple"),
+			];
 
-			if (ChatEntitlementRequests.providerId(this.configurationService) !== defaultChat.provider.enterprise.id) {
+			if (
+				ChatEntitlementRequests.providerId(this.configurationService) !==
+				defaultChat.provider.enterprise.id
+			) {
 				buttons = coalesce([
 					defaultProviderButton,
 					googleProviderButton,
-					variant === 'apple' ? appleProviderButton : undefined,
-					enterpriseProviderLink
+					variant === "apple" ? appleProviderButton : undefined,
+					enterpriseProviderLink,
 				]);
 			} else {
 				buttons = coalesce([
 					enterpriseProviderButton,
 					googleProviderButton,
-					variant === 'apple' ? appleProviderButton : undefined,
-					defaultProviderLink
+					variant === "apple" ? appleProviderButton : undefined,
+					defaultProviderLink,
 				]);
 			}
 		} else {
-			buttons = [[localize('setupCopilotButton', "Set up Copilot"), ChatSetupStrategy.DefaultSetup, undefined]];
+			buttons = [
+				[
+					localize("setupCopilotButton", "Set up Copilot"),
+					ChatSetupStrategy.DefaultSetup,
+					undefined,
+				],
+			];
 		}
 
-		buttons.push([localize('skipForNow', "Skip for now"), ChatSetupStrategy.Canceled, styleButton('link-button', 'skip-button')]);
+		buttons.push([
+			localize("skipForNow", "Skip for now"),
+			ChatSetupStrategy.Canceled,
+			styleButton("link-button", "skip-button"),
+		]);
 
 		return buttons;
 	}
 
 	private getDialogTitle(options?: { forceSignInDialog?: boolean }): string {
-		if (this.context.state.entitlement === ChatEntitlement.Unknown || options?.forceSignInDialog) {
-			return localize('signIn', "Sign in to use {0} Copilot", defaultChat.provider.default.name);
+		if (
+			this.context.state.entitlement === ChatEntitlement.Unknown ||
+			options?.forceSignInDialog
+		) {
+			return localize(
+				"signIn",
+				"Sign in to use {0} Copilot",
+				defaultChat.provider.default.name
+			);
 		}
 
-		return localize('startUsing', "Start using {0} Copilot", defaultChat.provider.default.name);
+		return localize(
+			"startUsing",
+			"Start using {0} Copilot",
+			defaultChat.provider.default.name
+		);
 	}
 
 	private createDialogFooter(disposables: DisposableStore): HTMLElement {
-		const element = $('.chat-setup-dialog-footer');
+		const element = $(".chat-setup-dialog-footer");
 
-		const markdown = this.instantiationService.createInstance(MarkdownRenderer, {});
+		const markdown = this.instantiationService.createInstance(
+			MarkdownRenderer,
+			{}
+		);
 
-		const footer = localize({ key: 'settings', comment: ['{Locked="["}', '{Locked="]({1})"}', '{Locked="]({2})"}', '{Locked="]({4})"}', '{Locked="]({5})"}'] }, "By continuing, you agree to {0}'s [Terms]({1}) and [Privacy Statement]({2}). {3} Copilot may show [public code]({4}) suggestions and use your data to improve the product. You can change these [settings]({5}) anytime.", defaultChat.provider.default.name, defaultChat.termsStatementUrl, defaultChat.privacyStatementUrl, defaultChat.provider.default.name, defaultChat.publicCodeMatchesUrl, defaultChat.manageSettingsUrl);
-		element.appendChild($('p', undefined, disposables.add(markdown.render(new MarkdownString(footer, { isTrusted: true }))).element));
+		const footer = localize(
+			{
+				key: "settings",
+				comment: [
+					'{Locked="["}',
+					'{Locked="]({1})"}',
+					'{Locked="]({2})"}',
+					'{Locked="]({4})"}',
+					'{Locked="]({5})"}',
+				],
+			},
+			"By continuing, you agree to {0}'s [Terms]({1}) and [Privacy Statement]({2}). {3} Copilot may show [public code]({4}) suggestions and use your data to improve the product. You can change these [settings]({5}) anytime.",
+			defaultChat.provider.default.name,
+			defaultChat.termsStatementUrl,
+			defaultChat.privacyStatementUrl,
+			defaultChat.provider.default.name,
+			defaultChat.publicCodeMatchesUrl,
+			defaultChat.manageSettingsUrl
+		);
+		element.appendChild(
+			$(
+				"p",
+				undefined,
+				disposables.add(
+					markdown.render(new MarkdownString(footer, { isTrusted: true }))
+				).element
+			)
+		);
 
 		return element;
 	}
 }
 
-const CHAT_DISABLED_CONFIGURATION_KEY = 'chat.disableAIFeatures';
-const CHAT_SETUP_ACTION_LABEL = localize2('triggerChatSetup', "Use AI Features with GitHub Copilot for free...");
+const CHAT_DISABLED_CONFIGURATION_KEY = "chat.disableAIFeatures";
+const CHAT_SETUP_ACTION_LABEL = localize2(
+	"triggerChatSetup",
+	"Use AI Features with GitHub Copilot for free..."
+);
 
-export class ChatSetupContribution extends Disposable implements IWorkbenchContribution {
-
-	static readonly ID = 'workbench.contrib.chatSetup';
+export class ChatSetupContribution
+	extends Disposable
+	implements IWorkbenchContribution
+{
+	static readonly ID = "workbench.contrib.chatSetup";
 
 	constructor(
 		@IProductService private readonly productService: IProductService,
-		@IInstantiationService private readonly instantiationService: IInstantiationService,
+		@IInstantiationService
+		private readonly instantiationService: IInstantiationService,
 		@ICommandService private readonly commandService: ICommandService,
 		@ITelemetryService private readonly telemetryService: ITelemetryService,
 		@IChatEntitlementService chatEntitlementService: ChatEntitlementService,
@@ -838,68 +1498,144 @@ export class ChatSetupContribution extends Disposable implements IWorkbenchContr
 			return; // disabled
 		}
 
-		const controller = new Lazy(() => this._register(this.instantiationService.createInstance(ChatSetupController, context, requests)));
+		const controller = new Lazy(() =>
+			this._register(
+				this.instantiationService.createInstance(
+					ChatSetupController,
+					context,
+					requests
+				)
+			)
+		);
 
 		this.registerSetupAgents(context, controller);
 		this.registerActions(context, requests, controller);
 		this.registerUrlLinkHandler();
 	}
 
-	private registerSetupAgents(context: ChatEntitlementContext, controller: Lazy<ChatSetupController>): void {
+	private registerSetupAgents(
+		context: ChatEntitlementContext,
+		controller: Lazy<ChatSetupController>
+	): void {
 		const defaultAgentDisposables = markAsSingleton(new MutableDisposable()); // prevents flicker on window reload
 		const vscodeAgentDisposables = markAsSingleton(new MutableDisposable());
 
 		const updateRegistration = () => {
 			if (!context.state.hidden && !context.state.disabled) {
-
 				// Default Agents (always, even if installed to allow for speedy requests right on startup)
 				if (!defaultAgentDisposables.value) {
-					const disposables = defaultAgentDisposables.value = new DisposableStore();
+					const disposables = (defaultAgentDisposables.value =
+						new DisposableStore());
 
 					// Panel Agents
 					const panelAgentDisposables = disposables.add(new DisposableStore());
-					for (const mode of [ChatModeKind.Ask, ChatModeKind.Edit, ChatModeKind.Agent]) {
-						const { agent, disposable } = SetupAgent.registerDefaultAgents(this.instantiationService, ChatAgentLocation.Panel, mode, context, controller);
+					for (const mode of [
+						ChatModeKind.Ask,
+						ChatModeKind.Edit,
+						ChatModeKind.Agent,
+					]) {
+						const { agent, disposable } = SetupAgent.registerDefaultAgents(
+							this.instantiationService,
+							ChatAgentLocation.Panel,
+							mode,
+							context,
+							controller
+						);
 						panelAgentDisposables.add(disposable);
-						panelAgentDisposables.add(agent.onUnresolvableError(() => {
-							const panelAgentHasGuidance = chatViewsWelcomeRegistry.get().some(descriptor => this.contextKeyService.contextMatchesRules(descriptor.when));
-							if (panelAgentHasGuidance) {
-								// An unresolvable error from our agent registrations means that
-								// Copilot is unhealthy for some reason. We clear our panel
-								// registration to give Copilot a chance to show a custom message
-								// to the user from the views and stop pretending as if there was
-								// a functional agent.
-								this.logService.error('[chat setup] Unresolvable error from Copilot agent registration, clearing registration.');
-								panelAgentDisposables.dispose();
-							}
-						}));
+						panelAgentDisposables.add(
+							agent.onUnresolvableError(() => {
+								const panelAgentHasGuidance = chatViewsWelcomeRegistry
+									.get()
+									.some((descriptor) =>
+										this.contextKeyService.contextMatchesRules(descriptor.when)
+									);
+								if (panelAgentHasGuidance) {
+									// An unresolvable error from our agent registrations means that
+									// Copilot is unhealthy for some reason. We clear our panel
+									// registration to give Copilot a chance to show a custom message
+									// to the user from the views and stop pretending as if there was
+									// a functional agent.
+									this.logService.error(
+										"[chat setup] Unresolvable error from Copilot agent registration, clearing registration."
+									);
+									panelAgentDisposables.dispose();
+								}
+							})
+						);
 					}
 
 					// Inline Agents
-					disposables.add(SetupAgent.registerDefaultAgents(this.instantiationService, ChatAgentLocation.Terminal, undefined, context, controller).disposable);
-					disposables.add(SetupAgent.registerDefaultAgents(this.instantiationService, ChatAgentLocation.Notebook, undefined, context, controller).disposable);
-					disposables.add(SetupAgent.registerDefaultAgents(this.instantiationService, ChatAgentLocation.Editor, undefined, context, controller).disposable);
+					disposables.add(
+						SetupAgent.registerDefaultAgents(
+							this.instantiationService,
+							ChatAgentLocation.Terminal,
+							undefined,
+							context,
+							controller
+						).disposable
+					);
+					disposables.add(
+						SetupAgent.registerDefaultAgents(
+							this.instantiationService,
+							ChatAgentLocation.Notebook,
+							undefined,
+							context,
+							controller
+						).disposable
+					);
+					disposables.add(
+						SetupAgent.registerDefaultAgents(
+							this.instantiationService,
+							ChatAgentLocation.Editor,
+							undefined,
+							context,
+							controller
+						).disposable
+					);
 				}
 
 				// Built-In Agent + Tool (unless installed, signed-in and enabled)
-				if ((!context.state.installed || context.state.entitlement === ChatEntitlement.Unknown || context.state.entitlement === ChatEntitlement.Unresolved) && !vscodeAgentDisposables.value) {
-					const disposables = vscodeAgentDisposables.value = new DisposableStore();
-					disposables.add(SetupAgent.registerBuiltInAgents(this.instantiationService, context, controller).disposable);
+				if (
+					(!context.state.installed ||
+						context.state.entitlement === ChatEntitlement.Unknown ||
+						context.state.entitlement === ChatEntitlement.Unresolved) &&
+					!vscodeAgentDisposables.value
+				) {
+					const disposables = (vscodeAgentDisposables.value =
+						new DisposableStore());
+					disposables.add(
+						SetupAgent.registerBuiltInAgents(
+							this.instantiationService,
+							context,
+							controller
+						).disposable
+					);
 				}
 			} else {
 				defaultAgentDisposables.clear();
 				vscodeAgentDisposables.clear();
 			}
 
-			if ((context.state.installed && context.state.entitlement !== ChatEntitlement.Unknown && context.state.entitlement !== ChatEntitlement.Unresolved) && !context.state.disabled) {
+			if (
+				context.state.installed &&
+				context.state.entitlement !== ChatEntitlement.Unknown &&
+				context.state.entitlement !== ChatEntitlement.Unresolved &&
+				!context.state.disabled
+			) {
 				vscodeAgentDisposables.clear(); // we need to do this to prevent showing duplicate agent/tool entries in the list
 			}
 		};
 
-		this._register(Event.runAndSubscribe(context.onDidChange, () => updateRegistration()));
+		this._register(
+			Event.runAndSubscribe(context.onDidChange, () => updateRegistration())
+		);
 	}
 
-	private registerActions(context: ChatEntitlementContext, requests: ChatEntitlementRequests, controller: Lazy<ChatSetupController>): void {
+	private registerActions(
+		context: ChatEntitlementContext,
+		requests: ChatEntitlementRequests,
+		controller: Lazy<ChatSetupController>
+	): void {
 		const chatSetupTriggerContext = ContextKeyExpr.and(
 			ContextKeyExpr.not(`config.${CHAT_DISABLED_CONFIGURATION_KEY}`),
 			ContextKeyExpr.or(
@@ -909,18 +1645,24 @@ export class ChatSetupContribution extends Disposable implements IWorkbenchContr
 		);
 
 		class ChatSetupTriggerAction extends Action2 {
-
 			constructor() {
 				super({
 					id: CHAT_SETUP_ACTION_ID,
 					title: CHAT_SETUP_ACTION_LABEL,
 					category: CHAT_CATEGORY,
 					f1: true,
-					precondition: chatSetupTriggerContext
+					precondition: chatSetupTriggerContext,
 				});
 			}
 
-			override async run(accessor: ServicesAccessor, mode?: ChatModeKind, options?: { forceSignInDialog?: boolean; additionalScopes?: readonly string[] }): Promise<boolean> {
+			override async run(
+				accessor: ServicesAccessor,
+				mode?: ChatModeKind,
+				options?: {
+					forceSignInDialog?: boolean;
+					additionalScopes?: readonly string[];
+				}
+			): Promise<boolean> {
 				const viewsService = accessor.get(IViewsService);
 				const layoutService = accessor.get(IWorkbenchLayoutService);
 				const instantiationService = accessor.get(IInstantiationService);
@@ -935,17 +1677,30 @@ export class ChatSetupContribution extends Disposable implements IWorkbenchContr
 					chatWidget?.input.setChatMode(mode);
 				}
 
-				const setup = ChatSetup.getInstance(instantiationService, context, controller);
+				const setup = ChatSetup.getInstance(
+					instantiationService,
+					context,
+					controller
+				);
 				const { success } = await setup.run(options);
 				if (success === false && !lifecycleService.willShutdown) {
 					const { confirmed } = await dialogService.confirm({
 						type: Severity.Error,
-						message: localize('setupErrorDialog', "Copilot setup failed. Would you like to try again?"),
-						primaryButton: localize('retry', "Retry"),
+						message: localize(
+							"setupErrorDialog",
+							"Copilot setup failed. Would you like to try again?"
+						),
+						primaryButton: localize("retry", "Retry"),
 					});
 
 					if (confirmed) {
-						return Boolean(await commandService.executeCommand(CHAT_SETUP_ACTION_ID, mode, options));
+						return Boolean(
+							await commandService.executeCommand(
+								CHAT_SETUP_ACTION_ID,
+								mode,
+								options
+							)
+						);
 					}
 				}
 
@@ -954,11 +1709,10 @@ export class ChatSetupContribution extends Disposable implements IWorkbenchContr
 		}
 
 		class ChatSetupTriggerForceSignInDialogAction extends Action2 {
-
 			constructor() {
 				super({
-					id: 'workbench.action.chat.triggerSetupForceSignIn',
-					title: localize2('forceSignIn', "Sign in to use Copilot")
+					id: "workbench.action.chat.triggerSetupForceSignIn",
+					title: localize2("forceSignIn", "Sign in to use Copilot"),
 				});
 			}
 
@@ -966,19 +1720,23 @@ export class ChatSetupContribution extends Disposable implements IWorkbenchContr
 				const commandService = accessor.get(ICommandService);
 				const telemetryService = accessor.get(ITelemetryService);
 
-				telemetryService.publicLog2<WorkbenchActionExecutedEvent, WorkbenchActionExecutedClassification>('workbenchActionExecuted', { id: CHAT_SETUP_ACTION_ID, from: 'api' });
+				telemetryService.publicLog2<
+					WorkbenchActionExecutedEvent,
+					WorkbenchActionExecutedClassification
+				>("workbenchActionExecuted", { id: CHAT_SETUP_ACTION_ID, from: "api" });
 
-				return commandService.executeCommand(CHAT_SETUP_ACTION_ID, undefined, { forceSignInDialog: true });
+				return commandService.executeCommand(CHAT_SETUP_ACTION_ID, undefined, {
+					forceSignInDialog: true,
+				});
 			}
 		}
 
 		class ChatSetupTriggerWithoutDialogAction extends Action2 {
-
 			constructor() {
 				super({
-					id: 'workbench.action.chat.triggerSetupWithoutDialog',
+					id: "workbench.action.chat.triggerSetupWithoutDialog",
 					title: CHAT_SETUP_ACTION_LABEL,
-					precondition: chatSetupTriggerContext
+					precondition: chatSetupTriggerContext,
 				});
 			}
 
@@ -990,26 +1748,32 @@ export class ChatSetupContribution extends Disposable implements IWorkbenchContr
 				await context.update({ hidden: false });
 
 				const chatWidget = await showCopilotView(viewsService, layoutService);
-				ChatSetup.getInstance(instantiationService, context, controller).skipDialog();
-				chatWidget?.acceptInput(localize('setupCopilot', "Set up Copilot."));
+				ChatSetup.getInstance(
+					instantiationService,
+					context,
+					controller
+				).skipDialog();
+				chatWidget?.acceptInput(localize("setupCopilot", "Set up Copilot."));
 			}
 		}
 
 		class ChatSetupFromAccountsAction extends Action2 {
-
 			constructor() {
 				super({
-					id: 'workbench.action.chat.triggerSetupFromAccounts',
-					title: localize2('triggerChatSetupFromAccounts', "Sign in to use Copilot..."),
+					id: "workbench.action.chat.triggerSetupFromAccounts",
+					title: localize2(
+						"triggerChatSetupFromAccounts",
+						"Sign in to use Copilot..."
+					),
 					menu: {
 						id: MenuId.AccountsContext,
-						group: '2_copilot',
+						group: "2_copilot",
 						when: ContextKeyExpr.and(
 							ChatContextKeys.Setup.hidden.negate(),
 							ChatContextKeys.Setup.installed.negate(),
 							ChatContextKeys.Entitlement.signedOut
-						)
-					}
+						),
+					},
 				});
 			}
 
@@ -1017,7 +1781,13 @@ export class ChatSetupContribution extends Disposable implements IWorkbenchContr
 				const commandService = accessor.get(ICommandService);
 				const telemetryService = accessor.get(ITelemetryService);
 
-				telemetryService.publicLog2<WorkbenchActionExecutedEvent, WorkbenchActionExecutedClassification>('workbenchActionExecuted', { id: CHAT_SETUP_ACTION_ID, from: 'accounts' });
+				telemetryService.publicLog2<
+					WorkbenchActionExecutedEvent,
+					WorkbenchActionExecutedClassification
+				>("workbenchActionExecuted", {
+					id: CHAT_SETUP_ACTION_ID,
+					from: "accounts",
+				});
 
 				return commandService.executeCommand(CHAT_SETUP_ACTION_ID);
 			}
@@ -1027,9 +1797,9 @@ export class ChatSetupContribution extends Disposable implements IWorkbenchContr
 		class UpgradePlanAction extends Action2 {
 			constructor() {
 				super({
-					id: 'workbench.action.chat.upgradePlan',
-					title: localize2('managePlan', "Upgrade to Copilot Pro"),
-					category: localize2('chat.category', 'Chat'),
+					id: "workbench.action.chat.upgradePlan",
+					title: localize2("managePlan", "Upgrade to Copilot Pro"),
+					category: localize2("chat.category", "Chat"),
 					f1: true,
 					precondition: ContextKeyExpr.and(
 						ContextKeyExpr.not(`config.${CHAT_DISABLED_CONFIGURATION_KEY}`),
@@ -1040,7 +1810,7 @@ export class ChatSetupContribution extends Disposable implements IWorkbenchContr
 					),
 					menu: {
 						id: MenuId.ChatTitleBarMenu,
-						group: 'a_first',
+						group: "a_first",
 						order: 1,
 						when: ContextKeyExpr.and(
 							ChatContextKeys.Entitlement.free,
@@ -1048,8 +1818,8 @@ export class ChatSetupContribution extends Disposable implements IWorkbenchContr
 								ChatContextKeys.chatQuotaExceeded,
 								ChatContextKeys.completionsQuotaExceeded
 							)
-						)
-					}
+						),
+					},
 				});
 			}
 
@@ -1064,16 +1834,26 @@ export class ChatSetupContribution extends Disposable implements IWorkbenchContr
 				if (!isProUser(entitlement)) {
 					// If the user is not yet Pro, we listen to window focus to refresh the token
 					// when the user has come back to the window assuming the user signed up.
-					windowFocusListener.value = hostService.onDidChangeFocus(focus => this.onWindowFocus(focus, commandService));
+					windowFocusListener.value = hostService.onDidChangeFocus((focus) =>
+						this.onWindowFocus(focus, commandService)
+					);
 				}
 			}
 
-			private async onWindowFocus(focus: boolean, commandService: ICommandService): Promise<void> {
+			private async onWindowFocus(
+				focus: boolean,
+				commandService: ICommandService
+			): Promise<void> {
 				if (focus) {
 					windowFocusListener.clear();
 
-					const entitlements = await requests.forceResolveEntitlement(undefined);
-					if (entitlements?.entitlement && isProUser(entitlements?.entitlement)) {
+					const entitlements = await requests.forceResolveEntitlement(
+						undefined
+					);
+					if (
+						entitlements?.entitlement &&
+						isProUser(entitlements?.entitlement)
+					) {
 						refreshTokens(commandService);
 					}
 				}
@@ -1083,32 +1863,32 @@ export class ChatSetupContribution extends Disposable implements IWorkbenchContr
 		class EnableOveragesAction extends Action2 {
 			constructor() {
 				super({
-					id: 'workbench.action.chat.manageOverages',
-					title: localize2('manageOverages', "Manage Copilot Overages"),
-					category: localize2('chat.category', 'Chat'),
+					id: "workbench.action.chat.manageOverages",
+					title: localize2("manageOverages", "Manage Copilot Overages"),
+					category: localize2("chat.category", "Chat"),
 					f1: true,
 					precondition: ContextKeyExpr.and(
 						ContextKeyExpr.not(`config.${CHAT_DISABLED_CONFIGURATION_KEY}`),
 						ContextKeyExpr.or(
 							ChatContextKeys.Entitlement.pro,
-							ChatContextKeys.Entitlement.proPlus,
+							ChatContextKeys.Entitlement.proPlus
 						)
 					),
 					menu: {
 						id: MenuId.ChatTitleBarMenu,
-						group: 'a_first',
+						group: "a_first",
 						order: 1,
 						when: ContextKeyExpr.and(
 							ContextKeyExpr.or(
 								ChatContextKeys.Entitlement.pro,
-								ChatContextKeys.Entitlement.proPlus,
+								ChatContextKeys.Entitlement.proPlus
 							),
 							ContextKeyExpr.or(
 								ChatContextKeys.chatQuotaExceeded,
 								ChatContextKeys.completionsQuotaExceeded
 							)
-						)
-					}
+						),
+					},
 				});
 			}
 
@@ -1127,33 +1907,55 @@ export class ChatSetupContribution extends Disposable implements IWorkbenchContr
 	}
 
 	private registerUrlLinkHandler(): void {
-		this._register(ExtensionUrlHandlerOverrideRegistry.registerHandler({
-			canHandleURL: url => {
-				return url.scheme === this.productService.urlProtocol && equalsIgnoreCase(url.authority, defaultChat.chatExtensionId);
-			},
-			handleURL: async url => {
-				const params = new URLSearchParams(url.query);
-				this.telemetryService.publicLog2<WorkbenchActionExecutedEvent, WorkbenchActionExecutedClassification>('workbenchActionExecuted', { id: CHAT_SETUP_ACTION_ID, from: 'url', detail: params.get('referrer') ?? undefined });
+		this._register(
+			ExtensionUrlHandlerOverrideRegistry.registerHandler({
+				canHandleURL: (url) => {
+					return (
+						url.scheme === this.productService.urlProtocol &&
+						equalsIgnoreCase(url.authority, defaultChat.chatExtensionId)
+					);
+				},
+				handleURL: async (url) => {
+					const params = new URLSearchParams(url.query);
+					this.telemetryService.publicLog2<
+						WorkbenchActionExecutedEvent,
+						WorkbenchActionExecutedClassification
+					>("workbenchActionExecuted", {
+						id: CHAT_SETUP_ACTION_ID,
+						from: "url",
+						detail: params.get("referrer") ?? undefined,
+					});
 
-				await this.commandService.executeCommand(CHAT_SETUP_ACTION_ID, validateChatMode(params.get('mode')));
+					await this.commandService.executeCommand(
+						CHAT_SETUP_ACTION_ID,
+						validateChatMode(params.get("mode"))
+					);
 
-				return true;
-			}
-		}));
+					return true;
+				},
+			})
+		);
 	}
 }
 
-export class ChatTeardownContribution extends Disposable implements IWorkbenchContribution {
-
-	static readonly ID = 'workbench.contrib.chatTeardown';
+export class ChatTeardownContribution
+	extends Disposable
+	implements IWorkbenchContribution
+{
+	static readonly ID = "workbench.contrib.chatTeardown";
 
 	constructor(
 		@IChatEntitlementService chatEntitlementService: ChatEntitlementService,
-		@IConfigurationService private readonly configurationService: IConfigurationService,
-		@IExtensionsWorkbenchService private readonly extensionsWorkbenchService: IExtensionsWorkbenchService,
-		@IWorkbenchExtensionEnablementService private readonly extensionEnablementService: IWorkbenchExtensionEnablementService,
-		@IViewDescriptorService private readonly viewDescriptorService: IViewDescriptorService,
-		@IWorkbenchLayoutService private readonly layoutService: IWorkbenchLayoutService
+		@IConfigurationService
+		private readonly configurationService: IConfigurationService,
+		@IExtensionsWorkbenchService
+		private readonly extensionsWorkbenchService: IExtensionsWorkbenchService,
+		@IWorkbenchExtensionEnablementService
+		private readonly extensionEnablementService: IWorkbenchExtensionEnablementService,
+		@IViewDescriptorService
+		private readonly viewDescriptorService: IViewDescriptorService,
+		@IWorkbenchLayoutService
+		private readonly layoutService: IWorkbenchLayoutService
 	) {
 		super();
 
@@ -1169,74 +1971,134 @@ export class ChatTeardownContribution extends Disposable implements IWorkbenchCo
 	}
 
 	private handleChatDisabled(fromEvent: boolean): void {
-		const chatDisabled = this.configurationService.inspect(CHAT_DISABLED_CONFIGURATION_KEY);
+		const chatDisabled = this.configurationService.inspect(
+			CHAT_DISABLED_CONFIGURATION_KEY
+		);
 		if (chatDisabled.value === true) {
-			this.maybeEnableOrDisableExtension(typeof chatDisabled.workspaceValue === 'boolean' ? EnablementState.DisabledWorkspace : EnablementState.DisabledGlobally);
+			this.maybeEnableOrDisableExtension(
+				typeof chatDisabled.workspaceValue === "boolean"
+					? EnablementState.DisabledWorkspace
+					: EnablementState.DisabledGlobally
+			);
 			if (fromEvent) {
 				this.maybeHideAuxiliaryBar();
 			}
-		} else if (chatDisabled.value === false && fromEvent /* do not enable extensions unless its an explicit settings change */) {
-			this.maybeEnableOrDisableExtension(typeof chatDisabled.workspaceValue === 'boolean' ? EnablementState.EnabledWorkspace : EnablementState.EnabledGlobally);
+		} else if (
+			chatDisabled.value === false &&
+			fromEvent /* do not enable extensions unless its an explicit settings change */
+		) {
+			this.maybeEnableOrDisableExtension(
+				typeof chatDisabled.workspaceValue === "boolean"
+					? EnablementState.EnabledWorkspace
+					: EnablementState.EnabledGlobally
+			);
 		}
 	}
 
 	private async registerListeners(): Promise<void> {
-
 		// Configuration changes
-		this._register(this.configurationService.onDidChangeConfiguration(e => {
-			if (!e.affectsConfiguration(CHAT_DISABLED_CONFIGURATION_KEY)) {
-				return;
-			}
+		this._register(
+			this.configurationService.onDidChangeConfiguration((e) => {
+				if (!e.affectsConfiguration(CHAT_DISABLED_CONFIGURATION_KEY)) {
+					return;
+				}
 
-			this.handleChatDisabled(true);
-		}));
+				this.handleChatDisabled(true);
+			})
+		);
 
 		// Extension installation
 		await this.extensionsWorkbenchService.queryLocal();
-		this._register(this.extensionsWorkbenchService.onChange(e => {
-			if (e && !ExtensionIdentifier.equals(e.identifier.id, defaultChat.chatExtensionId)) {
-				return; // unrelated event
-			}
+		this._register(
+			this.extensionsWorkbenchService.onChange((e) => {
+				if (
+					e &&
+					!ExtensionIdentifier.equals(
+						e.identifier.id,
+						defaultChat.chatExtensionId
+					)
+				) {
+					return; // unrelated event
+				}
 
-			const defaultChatExtension = this.extensionsWorkbenchService.local.find(value => ExtensionIdentifier.equals(value.identifier.id, defaultChat.chatExtensionId));
-			if (defaultChatExtension?.local && this.extensionEnablementService.isEnabled(defaultChatExtension.local)) {
-				this.configurationService.updateValue(CHAT_DISABLED_CONFIGURATION_KEY, false);
-			}
-		}));
+				const defaultChatExtension = this.extensionsWorkbenchService.local.find(
+					(value) =>
+						ExtensionIdentifier.equals(
+							value.identifier.id,
+							defaultChat.chatExtensionId
+						)
+				);
+				if (
+					defaultChatExtension?.local &&
+					this.extensionEnablementService.isEnabled(defaultChatExtension.local)
+				) {
+					this.configurationService.updateValue(
+						CHAT_DISABLED_CONFIGURATION_KEY,
+						false
+					);
+				}
+			})
+		);
 	}
 
-	private async maybeEnableOrDisableExtension(state: EnablementState.EnabledGlobally | EnablementState.EnabledWorkspace | EnablementState.DisabledGlobally | EnablementState.DisabledWorkspace): Promise<void> {
-		const defaultChatExtension = this.extensionsWorkbenchService.local.find(value => ExtensionIdentifier.equals(value.identifier.id, defaultChat.chatExtensionId));
+	private async maybeEnableOrDisableExtension(
+		state:
+			| EnablementState.EnabledGlobally
+			| EnablementState.EnabledWorkspace
+			| EnablementState.DisabledGlobally
+			| EnablementState.DisabledWorkspace
+	): Promise<void> {
+		const defaultChatExtension = this.extensionsWorkbenchService.local.find(
+			(value) =>
+				ExtensionIdentifier.equals(
+					value.identifier.id,
+					defaultChat.chatExtensionId
+				)
+		);
 		if (!defaultChatExtension) {
 			return;
 		}
 
-		await this.extensionsWorkbenchService.setEnablement([defaultChatExtension], state);
-		await this.extensionsWorkbenchService.updateRunningExtensions(state === EnablementState.EnabledGlobally || state === EnablementState.EnabledWorkspace ? localize('restartExtensionHost.reason.enable', "Enabling AI features") : localize('restartExtensionHost.reason.disable', "Disabling AI features"));
+		await this.extensionsWorkbenchService.setEnablement(
+			[defaultChatExtension],
+			state
+		);
+		await this.extensionsWorkbenchService.updateRunningExtensions(
+			state === EnablementState.EnabledGlobally ||
+				state === EnablementState.EnabledWorkspace
+				? localize("restartExtensionHost.reason.enable", "Enabling AI features")
+				: localize(
+						"restartExtensionHost.reason.disable",
+						"Disabling AI features"
+				  )
+		);
 	}
 
 	private maybeHideAuxiliaryBar(): void {
-		const activeContainers = this.viewDescriptorService.getViewContainersByLocation(ViewContainerLocation.AuxiliaryBar).filter(
-			container => this.viewDescriptorService.getViewContainerModel(container).activeViewDescriptors.length > 0
-		);
+		const activeContainers = this.viewDescriptorService
+			.getViewContainersByLocation(ViewContainerLocation.AuxiliaryBar)
+			.filter(
+				(container) =>
+					this.viewDescriptorService.getViewContainerModel(container)
+						.activeViewDescriptors.length > 0
+			);
 		if (
-			(activeContainers.length === 0) ||  													// chat view is already gone but we know it was there before
-			(activeContainers.length === 1 && activeContainers.at(0)?.id === CHAT_SIDEBAR_PANEL_ID) // chat view is the only view which is going to go away
+			activeContainers.length === 0 || // chat view is already gone but we know it was there before
+			(activeContainers.length === 1 &&
+				activeContainers.at(0)?.id === CHAT_SIDEBAR_PANEL_ID) // chat view is the only view which is going to go away
 		) {
 			this.layoutService.setPartHidden(true, Parts.AUXILIARYBAR_PART); // hide if there are no views in the secondary sidebar
 		}
 	}
 
 	private registerActions(context: ChatEntitlementContext): void {
-
 		// TODO@bpasero eventually replace this with the more broadly available
 		// setting for AI feature enablement and migrate UI state over to the
 		// setting (also drop Context.Installed/Context.Disabled and only use Hidden)
 		const that = this;
 		class ChatSetupHideAction extends Action2 {
-
-			static readonly ID = 'workbench.action.chat.hideSetup';
-			static readonly TITLE = localize2('hideChatSetup', "Hide AI Features");
+			static readonly ID = "workbench.action.chat.hideSetup";
+			static readonly TITLE = localize2("hideChatSetup", "Hide AI Features");
 
 			constructor() {
 				super({
@@ -1244,13 +2106,16 @@ export class ChatTeardownContribution extends Disposable implements IWorkbenchCo
 					title: ChatSetupHideAction.TITLE,
 					f1: true,
 					category: CHAT_CATEGORY,
-					precondition: ContextKeyExpr.and(ChatContextKeys.Setup.installed.negate(), ChatContextKeys.Setup.hidden.negate()),
+					precondition: ContextKeyExpr.and(
+						ChatContextKeys.Setup.installed.negate(),
+						ChatContextKeys.Setup.hidden.negate()
+					),
 					menu: {
 						id: MenuId.ChatTitleBarMenu,
-						group: 'z_hide',
+						group: "z_hide",
 						order: 1,
-						when: ChatContextKeys.Setup.installed.negate()
-					}
+						when: ChatContextKeys.Setup.installed.negate(),
+					},
 				});
 			}
 
@@ -1259,9 +2124,16 @@ export class ChatTeardownContribution extends Disposable implements IWorkbenchCo
 				const dialogService = accessor.get(IDialogService);
 
 				const { confirmed } = await dialogService.confirm({
-					message: localize('hideChatSetupConfirm', "Are you sure you want to hide AI features?"),
-					detail: localize('hideChatSetupDetail', "You can restore AI features by running the '{0}' command.", CHAT_SETUP_ACTION_LABEL.value),
-					primaryButton: localize('hideChatSetupButton', "Hide AI Features")
+					message: localize(
+						"hideChatSetupConfirm",
+						"Are you sure you want to hide AI features?"
+					),
+					detail: localize(
+						"hideChatSetupDetail",
+						"You can restore AI features by running the '{0}' command.",
+						CHAT_SETUP_ACTION_LABEL.value
+					),
+					primaryButton: localize("hideChatSetupButton", "Hide AI Features"),
 				});
 
 				if (!confirmed) {
@@ -1287,15 +2159,41 @@ export class ChatTeardownContribution extends Disposable implements IWorkbenchCo
 //#region Setup Controller
 
 type InstallChatClassification = {
-	owner: 'bpasero';
-	comment: 'Provides insight into chat installation.';
-	installResult: { classification: 'SystemMetaData'; purpose: 'FeatureInsight'; comment: 'Whether the extension was installed successfully, cancelled or failed to install.' };
-	installDuration: { classification: 'SystemMetaData'; purpose: 'FeatureInsight'; comment: 'The duration it took to install the extension.' };
-	signUpErrorCode: { classification: 'SystemMetaData'; purpose: 'FeatureInsight'; comment: 'The error code in case of an error signing up.' };
-	provider: { classification: 'SystemMetaData'; purpose: 'FeatureInsight'; comment: 'The provider used for the chat installation.' };
+	owner: "bpasero";
+	comment: "Provides insight into chat installation.";
+	installResult: {
+		classification: "SystemMetaData";
+		purpose: "FeatureInsight";
+		comment: "Whether the extension was installed successfully, cancelled or failed to install.";
+	};
+	installDuration: {
+		classification: "SystemMetaData";
+		purpose: "FeatureInsight";
+		comment: "The duration it took to install the extension.";
+	};
+	signUpErrorCode: {
+		classification: "SystemMetaData";
+		purpose: "FeatureInsight";
+		comment: "The error code in case of an error signing up.";
+	};
+	provider: {
+		classification: "SystemMetaData";
+		purpose: "FeatureInsight";
+		comment: "The provider used for the chat installation.";
+	};
 };
 type InstallChatEvent = {
-	installResult: 'installed' | 'alreadyInstalled' | 'cancelled' | 'failedInstall' | 'failedNotSignedIn' | 'failedSignUp' | 'failedNotTrusted' | 'failedNoSession' | 'failedMaybeLater' | 'failedEnterpriseSetup';
+	installResult:
+		| "installed"
+		| "alreadyInstalled"
+		| "cancelled"
+		| "failedInstall"
+		| "failedNotSignedIn"
+		| "failedSignUp"
+		| "failedNotTrusted"
+		| "failedNoSession"
+		| "failedMaybeLater"
+		| "failedEnterpriseSetup";
 	installDuration: number;
 	signUpErrorCode: number | undefined;
 	provider: string | undefined;
@@ -1304,32 +2202,36 @@ type InstallChatEvent = {
 enum ChatSetupStep {
 	Initial = 1,
 	SigningIn,
-	Installing
+	Installing,
 }
 
 class ChatSetupController extends Disposable {
-
 	private readonly _onDidChange = this._register(new Emitter<void>());
 	readonly onDidChange = this._onDidChange.event;
 
 	private _step = ChatSetupStep.Initial;
-	get step(): ChatSetupStep { return this._step; }
+	get step(): ChatSetupStep {
+		return this._step;
+	}
 
 	constructor(
 		private readonly context: ChatEntitlementContext,
 		private readonly requests: ChatEntitlementRequests,
 		@ITelemetryService private readonly telemetryService: ITelemetryService,
-		@IAuthenticationService private readonly authenticationService: IAuthenticationService,
-		@IExtensionsWorkbenchService private readonly extensionsWorkbenchService: IExtensionsWorkbenchService,
+		@IAuthenticationService
+		private readonly authenticationService: IAuthenticationService,
+		@IExtensionsWorkbenchService
+		private readonly extensionsWorkbenchService: IExtensionsWorkbenchService,
 		@IProductService private readonly productService: IProductService,
 		@ILogService private readonly logService: ILogService,
 		@IProgressService private readonly progressService: IProgressService,
 		@IActivityService private readonly activityService: IActivityService,
 		@ICommandService private readonly commandService: ICommandService,
 		@IDialogService private readonly dialogService: IDialogService,
-		@IConfigurationService private readonly configurationService: IConfigurationService,
+		@IConfigurationService
+		private readonly configurationService: IConfigurationService,
 		@ILifecycleService private readonly lifecycleService: ILifecycleService,
-		@IQuickInputService private readonly quickInputService: IQuickInputService,
+		@IQuickInputService private readonly quickInputService: IQuickInputService
 	) {
 		super();
 
@@ -1349,42 +2251,77 @@ class ChatSetupController extends Disposable {
 		this._onDidChange.fire();
 	}
 
-	async setup(options?: { forceSignIn?: boolean; useSocialProvider?: string; useEnterpriseProvider?: boolean; additionalScopes?: readonly string[] }): Promise<ChatSetupResultValue> {
+	async setup(options?: {
+		forceSignIn?: boolean;
+		useSocialProvider?: string;
+		useEnterpriseProvider?: boolean;
+		additionalScopes?: readonly string[];
+	}): Promise<ChatSetupResultValue> {
 		const watch = new StopWatch(false);
-		const title = localize('setupChatProgress', "Getting Copilot ready...");
-		const badge = this.activityService.showViewContainerActivity(CHAT_SIDEBAR_PANEL_ID, {
-			badge: new ProgressBadge(() => title),
-		});
+		const title = localize("setupChatProgress", "Getting Copilot ready...");
+		const badge = this.activityService.showViewContainerActivity(
+			CHAT_SIDEBAR_PANEL_ID,
+			{
+				badge: new ProgressBadge(() => title),
+			}
+		);
 
 		try {
-			return await this.progressService.withProgress({
-				location: ProgressLocation.Window,
-				command: CHAT_OPEN_ACTION_ID,
-				title,
-			}, () => this.doSetup(options ?? {}, watch));
+			return await this.progressService.withProgress(
+				{
+					location: ProgressLocation.Window,
+					command: CHAT_OPEN_ACTION_ID,
+					title,
+				},
+				() => this.doSetup(options ?? {}, watch)
+			);
 		} finally {
 			badge.dispose();
 		}
 	}
 
-	private async doSetup(options: { forceSignIn?: boolean; useSocialProvider?: string; useEnterpriseProvider?: boolean; additionalScopes?: readonly string[] }, watch: StopWatch): Promise<ChatSetupResultValue> {
-		this.context.suspend();  // reduces flicker
+	private async doSetup(
+		options: {
+			forceSignIn?: boolean;
+			useSocialProvider?: string;
+			useEnterpriseProvider?: boolean;
+			additionalScopes?: readonly string[];
+		},
+		watch: StopWatch
+	): Promise<ChatSetupResultValue> {
+		this.context.suspend(); // reduces flicker
 
 		let success: ChatSetupResultValue = false;
 		try {
-			const providerId = ChatEntitlementRequests.providerId(this.configurationService);
+			const providerId = ChatEntitlementRequests.providerId(
+				this.configurationService
+			);
 			let session: AuthenticationSession | undefined;
 			let entitlement: ChatEntitlement | undefined;
 
 			// Entitlement Unknown or `forceSignIn`: we need to sign-in user
-			if (this.context.state.entitlement === ChatEntitlement.Unknown || options.forceSignIn) {
+			if (
+				this.context.state.entitlement === ChatEntitlement.Unknown ||
+				options.forceSignIn
+			) {
 				this.setStep(ChatSetupStep.SigningIn);
 				const result = await this.signIn(options);
 				if (!result.session) {
 					this.doInstall(); // still install the extension in the background to remind the user to sign-in eventually
 
-					const provider = options.useSocialProvider ?? options.useEnterpriseProvider ? defaultChat.provider.enterprise.id : defaultChat.provider.default.id;
-					this.telemetryService.publicLog2<InstallChatEvent, InstallChatClassification>('commandCenter.chatInstall', { installResult: 'failedNotSignedIn', installDuration: watch.elapsed(), signUpErrorCode: undefined, provider });
+					const provider =
+						options.useSocialProvider ?? options.useEnterpriseProvider
+							? defaultChat.provider.enterprise.id
+							: defaultChat.provider.default.id;
+					this.telemetryService.publicLog2<
+						InstallChatEvent,
+						InstallChatClassification
+					>("commandCenter.chatInstall", {
+						installResult: "failedNotSignedIn",
+						installDuration: watch.elapsed(),
+						signUpErrorCode: undefined,
+						provider,
+					});
 					return undefined; // treat as cancelled because signing in already triggers an error dialog
 				}
 
@@ -1394,7 +2331,13 @@ class ChatSetupController extends Disposable {
 
 			// Await Install
 			this.setStep(ChatSetupStep.Installing);
-			success = await this.install(session, entitlement ?? this.context.state.entitlement, providerId, watch, options);
+			success = await this.install(
+				session,
+				entitlement ?? this.context.state.entitlement,
+				providerId,
+				watch,
+				options
+			);
 		} finally {
 			this.setStep(ChatSetupStep.Initial);
 			this.context.resume();
@@ -1403,7 +2346,13 @@ class ChatSetupController extends Disposable {
 		return success;
 	}
 
-	private async signIn(options: { useSocialProvider?: string; additionalScopes?: readonly string[] }): Promise<{ session: AuthenticationSession | undefined; entitlement: ChatEntitlement | undefined }> {
+	private async signIn(options: {
+		useSocialProvider?: string;
+		additionalScopes?: readonly string[];
+	}): Promise<{
+		session: AuthenticationSession | undefined;
+		entitlement: ChatEntitlement | undefined;
+	}> {
 		let session: AuthenticationSession | undefined;
 		let entitlements;
 		try {
@@ -1415,9 +2364,19 @@ class ChatSetupController extends Disposable {
 		if (!session && !this.lifecycleService.willShutdown) {
 			const { confirmed } = await this.dialogService.confirm({
 				type: Severity.Error,
-				message: localize('unknownSignInError', "Failed to sign in to {0}. Would you like to try again?", ChatEntitlementRequests.providerId(this.configurationService) === defaultChat.provider.enterprise.id ? defaultChat.provider.enterprise.name : defaultChat.provider.default.name),
-				detail: localize('unknownSignInErrorDetail', "You must be signed in to use Copilot."),
-				primaryButton: localize('retry', "Retry")
+				message: localize(
+					"unknownSignInError",
+					"Failed to sign in to {0}. Would you like to try again?",
+					ChatEntitlementRequests.providerId(this.configurationService) ===
+						defaultChat.provider.enterprise.id
+						? defaultChat.provider.enterprise.name
+						: defaultChat.provider.default.name
+				),
+				detail: localize(
+					"unknownSignInErrorDetail",
+					"You must be signed in to use Copilot."
+				),
+				primaryButton: localize("retry", "Retry"),
 			});
 
 			if (confirmed) {
@@ -1428,49 +2387,100 @@ class ChatSetupController extends Disposable {
 		return { session, entitlement: entitlements?.entitlement };
 	}
 
-	private async install(session: AuthenticationSession | undefined, entitlement: ChatEntitlement, providerId: string, watch: StopWatch, options: { useSocialProvider?: string; useEnterpriseProvider?: boolean; additionalScopes?: readonly string[] }): Promise<ChatSetupResultValue> {
-		const wasRunning = this.context.state.installed && !this.context.state.disabled;
+	private async install(
+		session: AuthenticationSession | undefined,
+		entitlement: ChatEntitlement,
+		providerId: string,
+		watch: StopWatch,
+		options: {
+			useSocialProvider?: string;
+			useEnterpriseProvider?: boolean;
+			additionalScopes?: readonly string[];
+		}
+	): Promise<ChatSetupResultValue> {
+		const wasRunning =
+			this.context.state.installed && !this.context.state.disabled;
 		let signUpResult: boolean | { errorCode: number } | undefined = undefined;
 
-		const provider = options.useSocialProvider ?? options.useEnterpriseProvider ? defaultChat.provider.enterprise.id : defaultChat.provider.default.id;
+		const provider =
+			options.useSocialProvider ?? options.useEnterpriseProvider
+				? defaultChat.provider.enterprise.id
+				: defaultChat.provider.default.id;
 		let sessions = session ? [session] : undefined;
 		try {
 			if (
-				entitlement !== ChatEntitlement.Free &&		// User is not signed up to Copilot Free
-				!isProUser(entitlement) &&					// User is not signed up for a Copilot subscription
-				entitlement !== ChatEntitlement.Unavailable	// User is eligible for Copilot Free
+				entitlement !== ChatEntitlement.Free && // User is not signed up to Copilot Free
+				!isProUser(entitlement) && // User is not signed up for a Copilot subscription
+				entitlement !== ChatEntitlement.Unavailable // User is eligible for Copilot Free
 			) {
 				if (!sessions) {
 					try {
 						// Consider all sessions for the provider to be suitable for signing up
-						const existingSessions = await this.authenticationService.getSessions(providerId);
-						sessions = existingSessions.length > 0 ? [...existingSessions] : undefined;
+						const existingSessions =
+							await this.authenticationService.getSessions(providerId);
+						sessions =
+							existingSessions.length > 0 ? [...existingSessions] : undefined;
 					} catch (error) {
 						// ignore - errors can throw if a provider is not registered
 					}
 
 					if (!sessions || sessions.length === 0) {
-						this.telemetryService.publicLog2<InstallChatEvent, InstallChatClassification>('commandCenter.chatInstall', { installResult: 'failedNoSession', installDuration: watch.elapsed(), signUpErrorCode: undefined, provider });
+						this.telemetryService.publicLog2<
+							InstallChatEvent,
+							InstallChatClassification
+						>("commandCenter.chatInstall", {
+							installResult: "failedNoSession",
+							installDuration: watch.elapsed(),
+							signUpErrorCode: undefined,
+							provider,
+						});
 						return false; // unexpected
 					}
 				}
 
 				signUpResult = await this.requests.signUpFree(sessions);
 
-				if (typeof signUpResult !== 'boolean' /* error */) {
-					this.telemetryService.publicLog2<InstallChatEvent, InstallChatClassification>('commandCenter.chatInstall', { installResult: 'failedSignUp', installDuration: watch.elapsed(), signUpErrorCode: signUpResult.errorCode, provider });
+				if (typeof signUpResult !== "boolean" /* error */) {
+					this.telemetryService.publicLog2<
+						InstallChatEvent,
+						InstallChatClassification
+					>("commandCenter.chatInstall", {
+						installResult: "failedSignUp",
+						installDuration: watch.elapsed(),
+						signUpErrorCode: signUpResult.errorCode,
+						provider,
+					});
 				}
 			}
 
 			await this.doInstallWithRetry();
 		} catch (error) {
 			this.logService.error(`[chat setup] install: error ${error}`);
-			this.telemetryService.publicLog2<InstallChatEvent, InstallChatClassification>('commandCenter.chatInstall', { installResult: isCancellationError(error) ? 'cancelled' : 'failedInstall', installDuration: watch.elapsed(), signUpErrorCode: undefined, provider });
+			this.telemetryService.publicLog2<
+				InstallChatEvent,
+				InstallChatClassification
+			>("commandCenter.chatInstall", {
+				installResult: isCancellationError(error)
+					? "cancelled"
+					: "failedInstall",
+				installDuration: watch.elapsed(),
+				signUpErrorCode: undefined,
+				provider,
+			});
 			return false;
 		}
 
-		if (typeof signUpResult === 'boolean') {
-			this.telemetryService.publicLog2<InstallChatEvent, InstallChatClassification>('commandCenter.chatInstall', { installResult: wasRunning && !signUpResult ? 'alreadyInstalled' : 'installed', installDuration: watch.elapsed(), signUpErrorCode: undefined, provider });
+		if (typeof signUpResult === "boolean") {
+			this.telemetryService.publicLog2<
+				InstallChatEvent,
+				InstallChatClassification
+			>("commandCenter.chatInstall", {
+				installResult:
+					wasRunning && !signUpResult ? "alreadyInstalled" : "installed",
+				installDuration: watch.elapsed(),
+				signUpErrorCode: undefined,
+				provider,
+			});
 		}
 
 		if (wasRunning) {
@@ -1497,9 +2507,15 @@ class ChatSetupController extends Disposable {
 			if (!this.lifecycleService.willShutdown) {
 				const { confirmed } = await this.dialogService.confirm({
 					type: Severity.Error,
-					message: localize('unknownSetupError', "An error occurred while setting up Copilot. Would you like to try again?"),
-					detail: error && !isCancellationError(error) ? toErrorMessage(error) : undefined,
-					primaryButton: localize('retry', "Retry")
+					message: localize(
+						"unknownSetupError",
+						"An error occurred while setting up Copilot. Would you like to try again?"
+					),
+					detail:
+						error && !isCancellationError(error)
+							? toErrorMessage(error)
+							: undefined,
+					primaryButton: localize("retry", "Retry"),
 				});
 
 				if (confirmed) {
@@ -1512,58 +2528,88 @@ class ChatSetupController extends Disposable {
 	}
 
 	private async doInstall(): Promise<void> {
-		await this.extensionsWorkbenchService.install(defaultChat.chatExtensionId, {
-			enable: true,
-			isApplicationScoped: true, 	// install into all profiles
-			isMachineScoped: false,		// do not ask to sync
-			installEverywhere: true,	// install in local and remote
-			installPreReleaseVersion: this.productService.quality !== 'stable'
-		}, ChatViewId);
+		await this.extensionsWorkbenchService.install(
+			defaultChat.chatExtensionId,
+			{
+				enable: true,
+				isApplicationScoped: true, // install into all profiles
+				isMachineScoped: false, // do not ask to sync
+				installEverywhere: true, // install in local and remote
+				installPreReleaseVersion: this.productService.quality !== "stable",
+			},
+			ChatViewId
+		);
 	}
 
-	async setupWithProvider(options: { useEnterpriseProvider: boolean; useSocialProvider: string | undefined; additionalScopes?: readonly string[] }): Promise<ChatSetupResultValue> {
-		const registry = Registry.as<IConfigurationRegistry>(ConfigurationExtensions.Configuration);
+	async setupWithProvider(options: {
+		useEnterpriseProvider: boolean;
+		useSocialProvider: string | undefined;
+		additionalScopes?: readonly string[];
+	}): Promise<ChatSetupResultValue> {
+		const registry = Registry.as<IConfigurationRegistry>(
+			ConfigurationExtensions.Configuration
+		);
 		registry.registerConfiguration({
-			'id': 'copilot.setup',
-			'type': 'object',
-			'properties': {
+			id: "copilot.setup",
+			type: "object",
+			properties: {
 				[defaultChat.completionsAdvancedSetting]: {
-					'type': 'object',
-					'properties': {
-						'authProvider': {
-							'type': 'string'
-						}
-					}
+					type: "object",
+					properties: {
+						authProvider: {
+							type: "string",
+						},
+					},
 				},
 				[defaultChat.providerUriSetting]: {
-					'type': 'string'
-				}
-			}
+					type: "string",
+				},
+			},
 		});
 
 		if (options.useEnterpriseProvider) {
 			const success = await this.handleEnterpriseInstance();
 			if (!success) {
-				this.telemetryService.publicLog2<InstallChatEvent, InstallChatClassification>('commandCenter.chatInstall', { installResult: 'failedEnterpriseSetup', installDuration: 0, signUpErrorCode: undefined, provider: undefined });
+				this.telemetryService.publicLog2<
+					InstallChatEvent,
+					InstallChatClassification
+				>("commandCenter.chatInstall", {
+					installResult: "failedEnterpriseSetup",
+					installDuration: 0,
+					signUpErrorCode: undefined,
+					provider: undefined,
+				});
 				return success; // not properly configured, abort
 			}
 		}
 
-		let existingAdvancedSetting = this.configurationService.inspect(defaultChat.completionsAdvancedSetting).user?.value;
+		let existingAdvancedSetting = this.configurationService.inspect(
+			defaultChat.completionsAdvancedSetting
+		).user?.value;
 		if (!isObject(existingAdvancedSetting)) {
 			existingAdvancedSetting = {};
 		}
 
 		if (options.useEnterpriseProvider) {
-			await this.configurationService.updateValue(`${defaultChat.completionsAdvancedSetting}`, {
-				...existingAdvancedSetting,
-				'authProvider': defaultChat.provider.enterprise.id
-			}, ConfigurationTarget.USER);
+			await this.configurationService.updateValue(
+				`${defaultChat.completionsAdvancedSetting}`,
+				{
+					...existingAdvancedSetting,
+					authProvider: defaultChat.provider.enterprise.id,
+				},
+				ConfigurationTarget.USER
+			);
 		} else {
-			await this.configurationService.updateValue(`${defaultChat.completionsAdvancedSetting}`, Object.keys(existingAdvancedSetting).length > 0 ? {
-				...existingAdvancedSetting,
-				'authProvider': undefined
-			} : undefined, ConfigurationTarget.USER);
+			await this.configurationService.updateValue(
+				`${defaultChat.completionsAdvancedSetting}`,
+				Object.keys(existingAdvancedSetting).length > 0
+					? {
+							...existingAdvancedSetting,
+							authProvider: undefined,
+					  }
+					: undefined,
+				ConfigurationTarget.USER
+			);
 		}
 
 		return this.setup({ ...options, forceSignIn: true });
@@ -1571,20 +2617,30 @@ class ChatSetupController extends Disposable {
 
 	private async handleEnterpriseInstance(): Promise<ChatSetupResultValue> {
 		const domainRegEx = /^[a-zA-Z\-_]+$/;
-		const fullUriRegEx = /^(https:\/\/)?([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.ghe\.com\/?$/;
+		const fullUriRegEx =
+			/^(https:\/\/)?([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.ghe\.com\/?$/;
 
-		const uri = this.configurationService.getValue<string>(defaultChat.providerUriSetting);
-		if (typeof uri === 'string' && fullUriRegEx.test(uri)) {
+		const uri = this.configurationService.getValue<string>(
+			defaultChat.providerUriSetting
+		);
+		if (typeof uri === "string" && fullUriRegEx.test(uri)) {
 			return true; // already setup with a valid URI
 		}
 
 		let isSingleWord = false;
 		const result = await this.quickInputService.input({
-			prompt: localize('enterpriseInstance', "What is your {0} instance?", defaultChat.provider.enterprise.name),
-			placeHolder: localize('enterpriseInstancePlaceholder', 'i.e. "octocat" or "https://octocat.ghe.com"...'),
+			prompt: localize(
+				"enterpriseInstance",
+				"What is your {0} instance?",
+				defaultChat.provider.enterprise.name
+			),
+			placeHolder: localize(
+				"enterpriseInstancePlaceholder",
+				'i.e. "octocat" or "https://octocat.ghe.com"...'
+			),
 			ignoreFocusLost: true,
 			value: uri,
-			validateInput: async value => {
+			validateInput: async (value) => {
 				isSingleWord = false;
 				if (!value) {
 					return undefined;
@@ -1593,18 +2649,27 @@ class ChatSetupController extends Disposable {
 				if (domainRegEx.test(value)) {
 					isSingleWord = true;
 					return {
-						content: localize('willResolveTo', "Will resolve to {0}", `https://${value}.ghe.com`),
-						severity: Severity.Info
+						content: localize(
+							"willResolveTo",
+							"Will resolve to {0}",
+							`https://${value}.ghe.com`
+						),
+						severity: Severity.Info,
 					};
-				} if (!fullUriRegEx.test(value)) {
+				}
+				if (!fullUriRegEx.test(value)) {
 					return {
-						content: localize('invalidEnterpriseInstance', 'You must enter a valid {0} instance (i.e. "octocat" or "https://octocat.ghe.com")', defaultChat.provider.enterprise.name),
-						severity: Severity.Error
+						content: localize(
+							"invalidEnterpriseInstance",
+							'You must enter a valid {0} instance (i.e. "octocat" or "https://octocat.ghe.com")',
+							defaultChat.provider.enterprise.name
+						),
+						severity: Severity.Error,
 					};
 				}
 
 				return undefined;
-			}
+			},
 		});
 
 		if (!result) {
@@ -1616,13 +2681,17 @@ class ChatSetupController extends Disposable {
 			resolvedUri = `https://${resolvedUri}.ghe.com`;
 		} else {
 			const normalizedUri = result.toLowerCase();
-			const hasHttps = normalizedUri.startsWith('https://');
+			const hasHttps = normalizedUri.startsWith("https://");
 			if (!hasHttps) {
 				resolvedUri = `https://${result}`;
 			}
 		}
 
-		await this.configurationService.updateValue(defaultChat.providerUriSetting, resolvedUri, ConfigurationTarget.USER);
+		await this.configurationService.updateValue(
+			defaultChat.providerUriSetting,
+			resolvedUri,
+			ConfigurationTarget.USER
+		);
 
 		return true;
 	}

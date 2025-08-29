@@ -62,10 +62,10 @@
         "path": "./themes/hc_light.json"
       },
       {
-        "id": "Bubz Default",
-        "label": "Bubz Default",
+        "id": "Architech Default",
+        "label": "Architech Default",
         "uiTheme": "vs-dark",
-        "path": "./themes/bubz_default.json"
+        "path": "./themes/architech_default.json"
       }
     ],
     "iconThemes": [
