@@ -22,8 +22,4 @@ product.overrides.json
 *.snap.actual
 *.tsbuildinfo
 .vscode-test
-<<<<<<< HEAD
 /extensions/chat
-=======
-chat
->>>>>>> 60ce091c65f (Add 'chat' to .gitignore to exclude chat-related files from version control)
