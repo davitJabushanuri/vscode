@@ -1,9 +1,9 @@
 {
-  "name": "code-oss-dev",
+  "name": "kodik",
   "version": "1.104.0",
   "distro": "ac1cb85a260685046f3a9961d551ab6901dd7cb6",
   "author": {
-    "name": "Microsoft Corporation"
+    "name": "Kodik"
   },
   "license": "MIT",
   "main": "./out/main.js",
