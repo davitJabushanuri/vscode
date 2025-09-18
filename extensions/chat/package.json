@@ -1,7 +1,7 @@
 {
   "name": "kodik-chat",
-  "displayName": "kodik",
-  "description": "",
+  "displayName": "%displayName%",
+  "description": "%description%",
   "version": "3.27.0",
   "icon": "assets/icons/icon.png",
   "engines": {
@@ -42,45 +42,45 @@
     "walkthroughs": [
       {
         "id": "KodikWalkthrough",
-        "title": "Meet Kodik, your new coding partner",
-        "description": "Kodik codes like a developer because it thinks like one. Here are 5 ways to put it to work:",
+        "title": "%walkthrough.title%",
+        "description": "%walkthrough.description%",
         "steps": [
           {
             "id": "welcome",
-            "title": "Start with a Goal, Not Just a Prompt",
-            "description": "Tell Kodik what you want to achieve. It plans, asks, and then codes, like a true partner.",
+            "title": "%walkthrough.step1.title%",
+            "description": "%walkthrough.step1.description%",
             "media": {
               "markdown": "walkthrough/step1.md"
             }
           },
           {
             "id": "learn",
-            "title": "Let Kodik Learn Your Codebase",
-            "description": "Point Kodik to your project. It builds understanding to make smart, context-aware changes.",
+            "title": "%walkthrough.step2.title%",
+            "description": "%walkthrough.step2.description%",
             "media": {
               "markdown": "walkthrough/step2.md"
             }
           },
           {
             "id": "advanced-features",
-            "title": "Always Use the Best AI Models",
-            "description": "Kodik empowers you with State-of-the-Art AI, connecting to top models (Anthropic, Gemini, OpenAI & more).",
+            "title": "%walkthrough.step3.title%",
+            "description": "%walkthrough.step3.description%",
             "media": {
               "markdown": "walkthrough/step3.md"
             }
           },
           {
             "id": "mcp",
-            "title": "Extend with Powerful Tools (MCP)",
-            "description": "Connect to databases, APIs, or discover new capabilities in the MCP Marketplace.",
+            "title": "%walkthrough.step4.title%",
+            "description": "%walkthrough.step4.description%",
             "media": {
               "markdown": "walkthrough/step4.md"
             }
           },
           {
             "id": "getting-started",
-            "title": "You're Always in Control",
-            "description": "Review Kodik's plans and diffs. Approve changes before they happen. No surprises.",
+            "title": "%walkthrough.step5.title%",
+            "description": "%walkthrough.step5.description%",
             "media": {
               "markdown": "walkthrough/step5.md"
             },
@@ -112,92 +112,92 @@
     },
     "commands": [
       {
-        "command": "cline.plusButtonClicked",
-        "title": "New Task",
+        "command": "kodik.plusButtonClicked",
+        "title": "%command.newTask.title%",
         "icon": "$(add)"
       },
       {
-        "command": "cline.mcpButtonClicked",
-        "title": "MCP Servers",
+        "command": "kodik.mcpButtonClicked",
+        "title": "%command.mcpServers.title%",
         "icon": "$(server)"
       },
       {
-        "command": "cline.historyButtonClicked",
-        "title": "History",
+        "command": "kodik.historyButtonClicked",
+        "title": "%command.history.title%",
         "icon": "$(history)"
       },
       {
-        "command": "cline.popoutButtonClicked",
-        "title": "Open in Editor",
+        "command": "kodik.popoutButtonClicked",
+        "title": "%command.openInEditor.title%",
         "icon": "$(link-external)"
       },
       {
-        "command": "cline.accountButtonClicked",
-        "title": "Account",
+        "command": "kodik.accountButtonClicked",
+        "title": "%command.account.title%",
         "icon": "$(account)"
       },
       {
-        "command": "cline.settingsButtonClicked",
-        "title": "Settings",
+        "command": "kodik.settingsButtonClicked",
+        "title": "%command.settings.title%",
         "icon": "$(settings-gear)"
       },
       {
-        "command": "cline.openInNewTab",
-        "title": "Open In New Tab",
-        "category": "Kodik"
+        "command": "kodik.openInNewTab",
+        "title": "%command.openInNewTab.title%",
+        "category": "%category.kodik%"
       },
       {
-        "command": "cline.dev.createTestTasks",
-        "title": "Create Test Tasks",
-        "category": "Kodik",
-        "when": "cline.isDevMode"
+        "command": "kodik.dev.createTestTasks",
+        "title": "%command.createTestTasks.title%",
+        "category": "%category.kodik%",
+        "when": "kodik.isDevMode"
       },
       {
-        "command": "cline.addToChat",
-        "title": "Add to Kodik",
-        "category": "Kodik"
+        "command": "kodik.addToChat",
+        "title": "%command.addToChat.title%",
+        "category": "%category.kodik%"
       },
       {
-        "command": "cline.addTerminalOutputToChat",
-        "title": "Add to Kodik",
-        "category": "Kodik"
+        "command": "kodik.addTerminalOutputToChat",
+        "title": "%command.addTerminalOutput.title%",
+        "category": "%category.kodik%"
       },
       {
-        "command": "cline.focusChatInput",
-        "title": "Jump to Chat Input",
-        "category": "Kodik"
+        "command": "kodik.focusChatInput",
+        "title": "%command.focusChatInput.title%",
+        "category": "%category.kodik%"
       },
       {
-        "command": "cline.generateGitCommitMessage",
-        "title": "Generate Commit Message with Kodik",
-        "category": "Kodik",
+        "command": "kodik.generateGitCommitMessage",
+        "title": "%command.generateCommitMessage.title%",
+        "category": "%category.kodik%",
         "icon": "$(robot)"
       },
       {
-        "command": "cline.abortGitCommitMessage",
-        "title": "Generate Commit Message with Kodik - Stop",
-        "category": "Kodik",
+        "command": "kodik.abortGitCommitMessage",
+        "title": "%command.generateCommitMessageStop.title%",
+        "category": "%category.kodik%",
         "icon": "$(debug-stop)"
       },
       {
-        "command": "cline.explainCode",
-        "title": "Explain with Kodik",
-        "category": "Kodik"
+        "command": "kodik.explainCode",
+        "title": "%command.explainCode.title%",
+        "category": "%category.kodik%"
       },
       {
-        "command": "cline.improveCode",
-        "title": "Improve with Kodik",
-        "category": "Kodik"
+        "command": "kodik.improveCode",
+        "title": "%command.improveCode.title%",
+        "category": "%category.kodik%"
       },
       {
-        "command": "cline.openWalkthrough",
-        "title": "Open Walkthrough",
-        "category": "Kodik"
+        "command": "kodik.openWalkthrough",
+        "title": "%command.openWalkthrough.title%",
+        "category": "%category.kodik%"
       }
     ],
     "keybindings": [
       {
-        "command": "cline.addToChat",
+        "command": "kodik.addToChat",
         "key": "cmd+'",
         "mac": "cmd+'",
         "win": "ctrl+'",
@@ -205,11 +205,11 @@
         "when": "editorHasSelection"
       },
       {
-        "command": "cline.generateGitCommitMessage",
+        "command": "kodik.generateGitCommitMessage",
         "when": "config.git.enabled && scmProvider == git"
       },
       {
-        "command": "cline.focusChatInput",
+        "command": "kodik.focusChatInput",
         "key": "cmd+'",
         "mac": "cmd+'",
         "win": "ctrl+'",
@@ -220,101 +220,101 @@
     "menus": {
       "view/title": [
         {
-          "command": "cline.plusButtonClicked",
+          "command": "kodik.plusButtonClicked",
           "group": "navigation@1",
           "when": "view == claude-dev.SidebarProvider"
         },
         {
-          "command": "cline.mcpButtonClicked",
+          "command": "kodik.mcpButtonClicked",
           "group": "navigation@2",
           "when": "view == claude-dev.SidebarProvider"
         },
         {
-          "command": "cline.historyButtonClicked",
+          "command": "kodik.historyButtonClicked",
           "group": "navigation@3",
           "when": "view == claude-dev.SidebarProvider"
         },
         {
-          "command": "cline.popoutButtonClicked",
+          "command": "kodik.popoutButtonClicked",
           "group": "navigation@4",
           "when": "view == claude-dev.SidebarProvider"
         },
         {
-          "command": "cline.accountButtonClicked",
+          "command": "kodik.accountButtonClicked",
           "group": "navigation@5",
           "when": "view == claude-dev.SidebarProvider"
         },
         {
-          "command": "cline.settingsButtonClicked",
+          "command": "kodik.settingsButtonClicked",
           "group": "navigation@6",
           "when": "view == claude-dev.SidebarProvider"
         }
       ],
       "editor/title": [
         {
-          "command": "cline.plusButtonClicked",
+          "command": "kodik.plusButtonClicked",
           "group": "navigation@1",
           "when": "activeWebviewPanelId == claude-dev.TabPanelProvider"
         },
         {
-          "command": "cline.mcpButtonClicked",
+          "command": "kodik.mcpButtonClicked",
           "group": "navigation@2",
           "when": "activeWebviewPanelId == claude-dev.TabPanelProvider"
         },
         {
-          "command": "cline.historyButtonClicked",
+          "command": "kodik.historyButtonClicked",
           "group": "navigation@3",
           "when": "activeWebviewPanelId == claude-dev.TabPanelProvider"
         },
         {
-          "command": "cline.popoutButtonClicked",
+          "command": "kodik.popoutButtonClicked",
           "group": "navigation@4",
           "when": "activeWebviewPanelId == claude-dev.TabPanelProvider"
         },
         {
-          "command": "cline.accountButtonClicked",
+          "command": "kodik.accountButtonClicked",
           "group": "navigation@5",
           "when": "activeWebviewPanelId == claude-dev.TabPanelProvider"
         },
         {
-          "command": "cline.settingsButtonClicked",
+          "command": "kodik.settingsButtonClicked",
           "group": "navigation@6",
           "when": "activeWebviewPanelId == claude-dev.TabPanelProvider"
         }
       ],
       "editor/context": [
         {
-          "command": "cline.addToChat",
+          "command": "kodik.addToChat",
           "group": "navigation",
           "when": "editorHasSelection"
         }
       ],
       "terminal/context": [
         {
-          "command": "cline.addTerminalOutputToChat",
+          "command": "kodik.addTerminalOutputToChat",
           "group": "navigation"
         }
       ],
       "scm/title": [
         {
-          "command": "cline.generateGitCommitMessage",
+          "command": "kodik.generateGitCommitMessage",
           "group": "navigation",
-          "when": "config.git.enabled && scmProvider == git && !cline.isGeneratingCommit"
+          "when": "config.git.enabled && scmProvider == git && !kodik.isGeneratingCommit"
         },
         {
-          "command": "cline.abortGitCommitMessage",
+          "command": "kodik.abortGitCommitMessage",
           "group": "navigation",
-          "when": "config.git.enabled && scmProvider == git && cline.isGeneratingCommit"
+          "when": "config.git.enabled && scmProvider == git && kodik.isGeneratingCommit"
         }
       ],
       "commandPalette": [
         {
-          "command": "cline.generateGitCommitMessage",
-          "when": "config.git.enabled && scmProvider == git && !cline.isGeneratingCommit"
+          "command": "kodik.generateGitCommitMessage",
+          "when": "config.git.enabled && scmProvider == git && !kodik.isGeneratingCommit"
         },
         {
-          "command": "cline.abortGitCommitMessage",
-          "when": "config.git.enabled && scmProvider == git && cline.isGeneratingCommit"
+          "command": "kodik.abortGitCommitMessage",
+          "when": "config.git.enabled && scmProvider == git && kodik.isGeneratingCommit"
         }
       ]
     },

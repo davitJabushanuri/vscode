@@ -38,8 +38,6 @@ else if (globalThis._VSCODE_PRODUCT_JSON && globalThis._VSCODE_PACKAGE_JSON) {
 	// Running out of sources
 	if (env["VSCODE_DEV"]) {
 		Object.assign(product, {
-			nameShort: `${product.nameShort} Dev`,
-			nameLong: `${product.nameLong} Dev`,
 			dataFolderName: `${product.dataFolderName}-dev`,
 			serverDataFolderName: product.serverDataFolderName
 				? `${product.serverDataFolderName}-dev`
@@ -71,7 +69,7 @@ else {
 		Object.assign(product, {
 			version: "1.104.0-dev",
 			nameShort: "Kodik",
-			nameLong: "Kodik Dev",
+			nameLong: "Kodik",
 			applicationName: "code-oss",
 			dataFolderName: ".vscode-oss",
 			urlProtocol: "code-oss",
