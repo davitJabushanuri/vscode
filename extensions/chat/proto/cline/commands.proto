@@ -11,10 +11,10 @@ option java_multiple_files = true;
 // intended to be called by the IDE directly instead of through the webview,
 // because they are triggered by interactions in the IDE.
 service CommandsService {
-  rpc addToCline(CommandContext) returns (Empty);
-  rpc fixWithCline(CommandContext) returns (Empty);
-  rpc explainWithCline(CommandContext) returns (Empty);
-  rpc improveWithCline(CommandContext) returns (Empty);
+  rpc addToChat(CommandContext) returns (Empty);
+  rpc fix(CommandContext) returns (Empty);
+  rpc explain(CommandContext) returns (Empty);
+  rpc improve(CommandContext) returns (Empty);
 }
 
 message CommandContext {

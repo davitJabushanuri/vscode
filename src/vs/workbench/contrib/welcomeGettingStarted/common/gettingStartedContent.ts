@@ -381,7 +381,7 @@ export const walkthroughs: GettingStartedWalkthroughContent = [
 		when: "!isWeb",
 		walkthroughPageTitle: localize(
 			"gettingStarted.setup.walkthroughPageTitle",
-			"Setup VS Code"
+			"Setup"
 		),
 		next: "Beginner",
 		content: {
@@ -465,7 +465,7 @@ export const walkthroughs: GettingStartedWalkthroughContent = [
 		next: "Beginner",
 		walkthroughPageTitle: localize(
 			"gettingStarted.setupWeb.walkthroughPageTitle",
-			"Setup VS Code Web"
+			"Setup Web"
 		),
 		content: {
 			type: "steps",
@@ -663,7 +663,7 @@ export const walkthroughs: GettingStartedWalkthroughContent = [
 		next: "Setup",
 		walkthroughPageTitle: localize(
 			"gettingStarted.setupAccessibility.walkthroughPageTitle",
-			"Setup VS Code Accessibility"
+			"Setup Accessibility"
 		),
 		content: {
 			type: "steps",
