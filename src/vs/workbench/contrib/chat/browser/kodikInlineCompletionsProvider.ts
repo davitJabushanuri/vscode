@@ -124,12 +124,30 @@ export class KodikInlineCompletionsProvider
 			if (this._lastAcceptedCompletion) {
 				const timeSinceAcceptance =
 					now - this._lastAcceptedCompletion.timestamp;
+
+				// If very recent acceptance (< cooldown), block completely
 				if (timeSinceAcceptance < this._acceptanceCooldown) {
 					return null;
 				}
-				// Check if we're trying to complete the same text again
+
+				// Check if we're at or near the position where completion was accepted
+				const acceptedPos = this._lastAcceptedCompletion.position;
+				const positionDistance =
+					Math.abs(position.lineNumber - acceptedPos.lineNumber) +
+					Math.abs(position.column - acceptedPos.column);
+
+				if (positionDistance <= 2) {
+					// Too close to where we just accepted, likely would offer same completion
+					return null;
+				}
+
+				// Check if current prefix already contains the accepted completion
 				const currentPrefix = this._getPrefix(model, position);
-				if (currentPrefix.includes(this._lastAcceptedCompletion.text)) {
+				const acceptedText = this._lastAcceptedCompletion.text;
+				if (
+					currentPrefix.includes(acceptedText) ||
+					acceptedText.includes(currentPrefix.split("\n").pop() || "")
+				) {
 					return null;
 				}
 			}
@@ -137,12 +155,22 @@ export class KodikInlineCompletionsProvider
 			// Skip if we would generate the same completion content again
 			if (this._lastCompletionContent) {
 				const currentContext = this._getPrefix(model, position);
+				const lastContentStart = this._lastCompletionContent.substring(
+					0,
+					Math.min(50, this._lastCompletionContent.length)
+				);
+
+				// Check if current context already contains the last completion
 				if (
-					currentContext.endsWith(this._lastCompletionContent.substring(0, 50))
+					currentContext.includes(lastContentStart) ||
+					currentContext.endsWith(lastContentStart) ||
+					lastContentStart.startsWith(currentContext.split("\n").pop() || "")
 				) {
 					return null;
 				}
-			} // Create and track the request promise
+			}
+
+			// Create and track the request promise
 			this._currentRequest = this._performCompletion(
 				model,
 				position,
@@ -226,19 +254,49 @@ export class KodikInlineCompletionsProvider
 		completions: InlineCompletions,
 		item: InlineCompletion
 	): void {
+		// Just log that item is shown, don't clear state here
+		this._logService.debug(
+			"KodikInlineCompletionsProvider: Completion item shown",
+			{
+				insertText:
+					typeof item.insertText === "string"
+						? item.insertText.substring(0, 50)
+						: "snippet",
+			}
+		);
+	}
+
+	/**
+	 * Handle when user actually accepts a completion - this prevents cycling
+	 */
+	handleDidAccept(
+		completions: InlineCompletions,
+		item: InlineCompletion
+	): void {
 		// Track acceptance to prevent immediate re-triggering
 		if (typeof item.insertText === "string" && this._lastCompletion) {
+			const acceptedText = item.insertText;
+			const originalPosition = this._lastCompletion.position;
+
+			// Calculate where cursor will be after acceptance
+			const lines = acceptedText.split("\n");
+			const newLine = originalPosition.lineNumber + lines.length - 1;
+			const newColumn =
+				lines.length > 1
+					? lines[lines.length - 1].length + 1
+					: originalPosition.column + acceptedText.length;
+
 			this._lastAcceptedCompletion = {
-				text: item.insertText,
-				position: this._lastCompletion.position,
+				text: acceptedText,
+				position: new Position(newLine, newColumn), // Predicted cursor position after acceptance
 				timestamp: Date.now(),
 			};
-			this._lastCompletionContent = item.insertText;
-		}
+			this._lastCompletionContent = acceptedText;
 
-		// Clear completion state to prevent immediate re-triggering
-		this._lastCompletion = null;
-		this._lastRequestPosition = null;
+			// Clear current completion to prevent re-offering
+			this._lastCompletion = null;
+			this._lastRequestPosition = null;
+		}
 
 		this._logService.debug(
 			"KodikInlineCompletionsProvider: Completion item accepted",
@@ -288,6 +346,170 @@ export class KodikInlineCompletionsProvider
 		this._logService.debug(
 			"KodikInlineCompletionsProvider: Disposing completions"
 		);
+	}
+
+	/**
+	 * Build enhanced context for better autocomplete suggestions
+	 */
+	private _buildEnhancedContext(
+		prefix: string,
+		suffix: string,
+		languageId: string,
+		contextIndent: ContextIndentation
+	) {
+		const lines = prefix.split("\n");
+		const currentLine = lines[lines.length - 1] || "";
+		const previousLines = lines.slice(-5, -1); // Last 4 lines before current
+		const nextLines = suffix.split("\n").slice(0, 3); // Next 3 lines
+
+		// Detect context patterns
+		const isInFunction = /\b(function|def|fn|func|method|=\s*\(|=>)/.test(
+			previousLines.join("\n")
+		);
+		const isInClass = /\b(class|struct|interface|type)/.test(prefix);
+		const isInComment = /\/\*|\*|\*\/|\/\/|#|'''|"""|<!--|-->/.test(
+			currentLine
+		);
+		const isAfterOpenBrace =
+			currentLine.trimEnd().endsWith("{") ||
+			currentLine.trimEnd().endsWith("(");
+		const isAfterOperator = /[=+\-*/<>!&|,]\s*$/.test(currentLine);
+		const isStartOfLine = currentLine.trim() === "";
+
+		// Extract identifiers and imports for context
+		const imports =
+			prefix.match(/^\s*(?:import|from|#include|require|using)\s+.+$/gm) || [];
+		const identifiers = prefix.match(/\b[a-zA-Z_][a-zA-Z0-9_]*\b/g) || [];
+		const recentIdentifiers = [...new Set(identifiers.slice(-20))];
+
+		// Detect incomplete patterns that need completion
+		const incompleteFor = /\bfor\s*\([^)]*$/i.test(currentLine);
+		const incompleteIf = /\bif\s*\([^)]*$/i.test(currentLine);
+		const incompleteFunction = /\b(?:function|def|fn)\s+\w*\s*\([^)]*$/i.test(
+			currentLine
+		);
+		const incompleteDot = /\w\.\s*$/.test(currentLine);
+
+		return {
+			currentLine,
+			previousLines,
+			nextLines,
+			isInFunction,
+			isInClass,
+			isInComment,
+			isAfterOpenBrace,
+			isAfterOperator,
+			isStartOfLine,
+			imports,
+			recentIdentifiers,
+			incompleteFor,
+			incompleteIf,
+			incompleteFunction,
+			incompleteDot,
+			indentation: contextIndent,
+		};
+	}
+
+	/**
+	 * Build intelligent autocomplete prompt based on context analysis
+	 */
+	private _buildIntelligentAutocompletePrompt(
+		context: any,
+		languageId: string
+	): string {
+		const {
+			currentLine,
+			previousLines,
+			nextLines,
+			isInFunction,
+			isInClass,
+			isInComment,
+			isAfterOpenBrace,
+			isAfterOperator,
+			isStartOfLine,
+			imports,
+			recentIdentifiers,
+			incompleteFor,
+			incompleteIf,
+			incompleteFunction,
+			incompleteDot,
+		} = context;
+
+		// Skip completions in comments
+		if (isInComment) {
+			return "";
+		}
+
+		let prompt = `You are an expert ${languageId} code completion AI. Analyze the context and provide the most likely next code.
+
+CONTEXT ANALYSIS:
+`;
+
+		// Add contextual information
+		if (imports.length > 0) {
+			prompt += `Available imports: ${imports.slice(-3).join(", ")}\n`;
+		}
+
+		if (recentIdentifiers.length > 0) {
+			prompt += `Recent identifiers: ${recentIdentifiers
+				.slice(-10)
+				.join(", ")}\n`;
+		}
+
+		prompt += `\nCODE CONTEXT:\n`;
+
+		if (previousLines.length > 0) {
+			prompt += `Previous lines:\n${previousLines
+				.map(
+					(line: string, i: number) => `${previousLines.length - i}. ${line}`
+				)
+				.join("\n")}\n`;
+		}
+
+		prompt += `Current: ${currentLine}[CURSOR]`;
+
+		if (nextLines.length > 0 && nextLines[0].trim()) {
+			prompt += `\nNext lines:\n${nextLines
+				.slice(0, 2)
+				.map((line: string, i: number) => `+${i + 1}. ${line}`)
+				.join("\n")}`;
+		}
+
+		prompt += `\n\nCOMPLETION RULES:\n`;
+
+		// Context-specific rules
+		if (incompleteDot) {
+			prompt += `- Complete the method/property access after the dot\n`;
+		} else if (incompleteFor) {
+			prompt += `- Complete the for loop syntax appropriately\n`;
+		} else if (incompleteIf) {
+			prompt += `- Complete the if condition syntax\n`;
+		} else if (incompleteFunction) {
+			prompt += `- Complete the function signature\n`;
+		} else if (isAfterOpenBrace) {
+			prompt += `- Provide appropriate content for the block (variable, statement, etc.)\n`;
+		} else if (isAfterOperator) {
+			prompt += `- Complete the expression after the operator\n`;
+		} else if (isStartOfLine) {
+			if (isInFunction) {
+				prompt += `- Suggest appropriate statement for inside function\n`;
+			} else if (isInClass) {
+				prompt += `- Suggest appropriate class member (method, property)\n`;
+			} else {
+				prompt += `- Suggest appropriate top-level code\n`;
+			}
+		} else {
+			prompt += `- Complete the current statement intelligently\n`;
+		}
+
+		prompt += `- Return ONLY the code to insert at cursor, no explanations\n`;
+		prompt += `- Match indentation and coding style\n`;
+		prompt += `- Be concise but contextually appropriate\n`;
+		prompt += `- No markdown formatting\n\n`;
+
+		prompt += `Complete the code:`;
+
+		return prompt;
 	}
 
 	// Microsoft's block parsing logic adapted for VS Code core APIs
@@ -482,31 +704,28 @@ export class KodikInlineCompletionsProvider
 			let response: string | undefined;
 
 			if (this._kodikApi.sendAutocompleteRequest) {
-				// Use dedicated autocomplete method with focused context
+				// Enhanced autocomplete with much better context gathering
+				const enhancedContext = this._buildEnhancedContext(
+					prefix,
+					suffix,
+					languageId,
+					contextIndent
+				);
+
 				const autocompleteContext = {
 					language: languageId,
 					prefix: prefix,
-					suffix: suffix.substring(0, 500),
+					suffix: suffix.substring(0, 1000), // Increased suffix context
 					indentation: contextIndent,
-					mode: "inline_completion", // Signal this is for inline completions
+					mode: "inline_completion",
+					enhancedContext,
 				};
 
-				// Get just the current line for better context
-				const currentLinePrefix = prefix.split("\n").slice(-1)[0] || "";
-				const nextLineStart = suffix.split("\n")[0] || "";
-
-				const autocompletePrompt = `Complete the code at cursor position. Return only the immediate next code needed, NOT a full function or method.
-
-Rules:
-- Return only the minimal completion from cursor position
-- Do not return complete functions/methods if user is just starting to type
-- Focus on the immediate next logical piece of code
-- No markdown, no explanations
-
-Language: ${languageId}
-Current line: ${currentLinePrefix}[CURSOR]${nextLineStart}
-
-Complete:`;
+				// Build intelligent autocomplete prompt with rich context
+				const autocompletePrompt = this._buildIntelligentAutocompletePrompt(
+					enhancedContext,
+					languageId
+				);
 
 				// Make API call with cancellation support and proper cleanup
 				let disposable: any = null;
@@ -528,20 +747,17 @@ Complete:`;
 					}
 				}
 			} else {
-				// Fallback to sendMessage with very explicit instructions
-				const currentLinePrefix = prefix.split("\n").slice(-1)[0] || "";
-				const nextLineStart = suffix.split("\n")[0] || "";
-
-				const systemMessage = `You are a code completion assistant. Complete only the immediate next piece of code at cursor.
-
-STRICT RULES:
-1. Return only minimal completion from cursor
-2. Do NOT return full functions if user just typed opening brace
-3. Do NOT create files, tests, or documentation
-4. No markdown, no explanations
-5. Focus on immediate logical next code piece`;
-
-				const prompt = `${systemMessage}\n\nLanguage: ${languageId}\nCurrent: ${currentLinePrefix}[CURSOR]${nextLineStart}\n\nComplete:`;
+				// Enhanced fallback with better context
+				const enhancedContext = this._buildEnhancedContext(
+					prefix,
+					suffix,
+					languageId,
+					contextIndent
+				);
+				const prompt = this._buildIntelligentAutocompletePrompt(
+					enhancedContext,
+					languageId
+				);
 
 				// Make API call with cancellation support and proper cleanup
 				let disposable2: any = null;
