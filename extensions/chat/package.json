@@ -193,6 +193,36 @@
         "command": "kodik.openWalkthrough",
         "title": "%command.openWalkthrough.title%",
         "category": "%category.kodik%"
+      },
+      {
+        "command": "cline.enableAutocomplete",
+        "title": "Enable Autocomplete",
+        "category": "%category.kodik%"
+      },
+      {
+        "command": "cline.disableAutocomplete",
+        "title": "Disable Autocomplete",
+        "category": "%category.kodik%"
+      },
+      {
+        "command": "cline.toggleAutocomplete",
+        "title": "Toggle Autocomplete",
+        "category": "%category.kodik%"
+      },
+      {
+        "command": "cline.quickEdit",
+        "title": "Quick Edit (Inline Chat)",
+        "category": "%category.kodik%"
+      },
+      {
+        "command": "cline.quickEditSelection",
+        "title": "Quick Edit Selection",
+        "category": "%category.kodik%"
+      },
+      {
+        "command": "cline.quickEditCurrentLine",
+        "title": "Quick Edit Current Line",
+        "category": "%category.kodik%"
       }
     ],
     "keybindings": [
@@ -215,6 +245,13 @@
         "win": "ctrl+'",
         "linux": "ctrl+'",
         "when": "!editorHasSelection"
+      },
+      {
+        "command": "kodik.toggleAutocomplete",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a",
+        "win": "ctrl+shift+a",
+        "linux": "ctrl+shift+a"
       }
     ],
     "menus": {
@@ -320,7 +357,52 @@
     },
     "configuration": {
       "title": "Kodik",
-      "properties": {}
+      "properties": {
+        "kodik.autocompletion.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable AI-powered autocompletion",
+          "order": 1
+        },
+        "kodik.autocompletion.debounceDelay": {
+          "type": "number",
+          "default": 300,
+          "minimum": 50,
+          "maximum": 2000,
+          "description": "Delay in milliseconds before triggering autocompletion",
+          "order": 2
+        },
+        "kodik.autocompletion.maxCompletionLength": {
+          "type": "number",
+          "default": 500,
+          "minimum": 100,
+          "maximum": 2000,
+          "description": "Maximum length of completion suggestions",
+          "order": 3
+        },
+        "kodik.autocompletion.contextLines": {
+          "type": "number",
+          "default": 20,
+          "minimum": 5,
+          "maximum": 100,
+          "description": "Number of context lines to include before and after cursor",
+          "order": 4
+        },
+        "kodik.autocompletion.excludePatterns": {
+          "type": "array",
+          "default": [
+            "*.log",
+            "*.tmp",
+            "node_modules/**",
+            ".git/**"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "File patterns to exclude from autocompletion",
+          "order": 5
+        }
+      }
     }
   },
   "scripts": {},

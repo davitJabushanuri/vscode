@@ -40,6 +40,11 @@ service AccountService {
   rpc openrouterAuthClicked(EmptyRequest) returns (Empty);
   
   rpc accountDirectLogin(DirectLoginRequest) returns (String);
+  
+  // OAuth flow methods
+  rpc createOAuthAuthorizationUrl(OAuthProviderRequest) returns (OAuthAuthorizationResponse);
+  
+  rpc handleOAuthCallback(OAuthCallbackRequest) returns (String);
 }
 
 message AuthStateChangedRequest {
@@ -138,4 +143,20 @@ message DirectLoginRequest {
   string password = 2;
   optional string company = 3;
   optional string action = 4;
+}
+
+message OAuthProviderRequest {
+  string provider = 1; // "google" or "github"
+  optional string source = 2; // "ide" or "landing_page" - defaults to "ide"
+}
+
+message OAuthAuthorizationResponse {
+  string authorization_url = 1;
+  string state = 2;
+}
+
+message OAuthCallbackRequest {
+  string provider = 1; // "google" or "github"
+  string code = 2;
+  string state = 3;
 }
