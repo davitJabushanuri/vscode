@@ -35,7 +35,8 @@
   "activationEvents": [
     "onLanguage",
     "onStartupFinished",
-    "workspaceContains:evals.env"
+    "workspaceContains:evals.env",
+    "onUri"
   ],
   "main": "./dist/extension.js",
   "contributes": {
