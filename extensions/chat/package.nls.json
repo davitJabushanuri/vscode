@@ -2,19 +2,6 @@
 	"displayName": "Chat",
 	"description": "Autonomous coding agent right in your IDE, capable of creating/editing files, running commands, using the browser, and more with your permission every step of the way.",
 
-	"walkthrough.title": "Meet Kodik, your new coding partner",
-	"walkthrough.description": "Kodik codes like a developer because it thinks like one. Here are 5 ways to put it to work:",
-	"walkthrough.step1.title": "Start with a Goal, Not Just a Prompt",
-	"walkthrough.step1.description": "Tell Kodik what you want to achieve. It plans, asks, and then codes, like a true partner.",
-	"walkthrough.step2.title": "Let Kodik Learn Your Codebase",
-	"walkthrough.step2.description": "Point Kodik to your project. It builds understanding to make smart, context-aware changes.",
-	"walkthrough.step3.title": "Always Use the Best AI Models",
-	"walkthrough.step3.description": "Kodik empowers you with State-of-the-Art AI, connecting to top models (Anthropic, Gemini, OpenAI & more).",
-	"walkthrough.step4.title": "Extend with Powerful Tools (MCP)",
-	"walkthrough.step4.description": "Connect to databases, APIs, or discover new capabilities in the MCP Marketplace.",
-	"walkthrough.step5.title": "You're Always in Control",
-	"walkthrough.step5.description": "Review Kodik's plans and diffs. Approve changes before they happen. No surprises.",
-
 	"viewContainer.title": "Kodik",
 
 	"command.newTask.title": "New Task",
@@ -34,7 +21,6 @@
 	"command.generateCommitMessageStop.title": "Generate Commit Message with Kodik - Stop",
 	"command.explainCode.title": "Explain with Kodik",
 	"command.improveCode.title": "Improve with Kodik",
-	"command.openWalkthrough.title": "Open Walkthrough",
 
 	"category.kodik": "Kodik",
 

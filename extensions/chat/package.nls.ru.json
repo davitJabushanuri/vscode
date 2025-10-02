@@ -2,19 +2,6 @@
 	"displayName": "Чат",
 	"description": "Автономный агент кодирования прямо в вашей IDE, способный создавать/редактировать файлы, выполнять команды, использовать браузер и многое другое с вашего разрешения на каждом шагу.",
 
-	"walkthrough.title": "Познакомьтесь с Kodik, вашим новым партнером по кодированию",
-	"walkthrough.description": "Kodik кодит как разработчик, потому что думает как разработчик. Вот 5 способов заставить его работать:",
-	"walkthrough.step1.title": "Начните с цели, а не просто с подсказки",
-	"walkthrough.step1.description": "Скажите Kodik, чего вы хотите достичь. Он планирует, спрашивает, а затем кодит, как настоящий партнер.",
-	"walkthrough.step2.title": "Позвольте Kodik изучить вашу кодовую базу",
-	"walkthrough.step2.description": "Укажите Kodik на ваш проект. Он создает понимание для умных, контекстно-ориентированных изменений.",
-	"walkthrough.step3.title": "Всегда используйте лучшие модели ИИ",
-	"walkthrough.step3.description": "Kodik наделяет вас современным ИИ, подключаясь к топовым моделям (Anthropic, Gemini, OpenAI и др.).",
-	"walkthrough.step4.title": "Расширьте возможности с помощью мощных инструментов (MCP)",
-	"walkthrough.step4.description": "Подключайтесь к базам данных, API или открывайте новые возможности в MCP Marketplace.",
-	"walkthrough.step5.title": "Вы всегда в контроле",
-	"walkthrough.step5.description": "Просматривайте планы и различия Kodik. Одобряйте изменения до их выполнения. Никаких сюрпризов.",
-
 	"viewContainer.title": "Kodik",
 
 	"command.newTask.title": "Новая задача",
@@ -34,7 +21,6 @@
 	"command.generateCommitMessageStop.title": "Генерировать сообщение коммита с Kodik - Остановить",
 	"command.explainCode.title": "Объяснить с Kodik",
 	"command.improveCode.title": "Улучшить с Kodik",
-	"command.openWalkthrough.title": "Открыть пошаговое руководство",
 
 	"category.kodik": "Kodik",
 

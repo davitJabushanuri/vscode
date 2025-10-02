@@ -45,62 +45,17 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
-    "walkthroughs": [
-      {
-        "id": "KodikWalkthrough",
-        "title": "%walkthrough.title%",
-        "description": "%walkthrough.description%",
-        "steps": [
-          {
-            "id": "welcome",
-            "title": "%walkthrough.step1.title%",
-            "description": "%walkthrough.step1.description%",
-            "media": {
-              "markdown": "walkthrough/step1.md"
-            }
-          },
-          {
-            "id": "learn",
-            "title": "%walkthrough.step2.title%",
-            "description": "%walkthrough.step2.description%",
-            "media": {
-              "markdown": "walkthrough/step2.md"
-            }
-          },
-          {
-            "id": "advanced-features",
-            "title": "%walkthrough.step3.title%",
-            "description": "%walkthrough.step3.description%",
-            "media": {
-              "markdown": "walkthrough/step3.md"
-            }
-          },
-          {
-            "id": "mcp",
-            "title": "%walkthrough.step4.title%",
-            "description": "%walkthrough.step4.description%",
-            "media": {
-              "markdown": "walkthrough/step4.md"
-            }
-          },
-          {
-            "id": "getting-started",
-            "title": "%walkthrough.step5.title%",
-            "description": "%walkthrough.step5.description%",
-            "media": {
-              "markdown": "walkthrough/step5.md"
-            },
-            "content": {
-              "path": "walkthrough/step5.md"
-            }
-          }
-        ]
-      }
-    ],
     "viewsContainers": {
       "activitybar": [
         {
           "id": "kodik-ActivityBar",
+          "title": "Kodik",
+          "icon": "assets/icons/icon.svg"
+        }
+      ],
+      "panel": [
+        {
+          "id": "kodik-Panel",
           "title": "Kodik",
           "icon": "assets/icons/icon.svg"
         }
@@ -112,6 +67,14 @@
           "type": "webview",
           "id": "kodik.SidebarProvider",
           "name": "",
+          "icon": "assets/icons/icon.svg"
+        }
+      ],
+      "kodik-Panel": [
+        {
+          "type": "webview",
+          "id": "kodik.PanelProvider",
+          "name": "Kodik",
           "icon": "assets/icons/icon.svg"
         }
       ]
@@ -205,21 +168,6 @@
         "category": "%category.kodik%"
       },
       {
-        "command": "kodik.openWalkthrough",
-        "title": "%command.openWalkthrough.title%",
-        "category": "%category.kodik%"
-      },
-      {
-        "command": "cline.enableAutocomplete",
-        "title": "Enable Autocomplete",
-        "category": "%category.kodik%"
-      },
-      {
-        "command": "cline.disableAutocomplete",
-        "title": "Disable Autocomplete",
-        "category": "%category.kodik%"
-      },
-      {
         "command": "kodik.autocomplete.toggle",
         "title": "Toggle Autocomplete",
         "category": "%category.kodik%"
@@ -252,21 +200,6 @@
       {
         "command": "kodik.autocomplete.fixSettings",
         "title": "Fix VS Code Inline Completion Settings",
-        "category": "%category.kodik%"
-      },
-      {
-        "command": "cline.quickEdit",
-        "title": "Quick Edit (Inline Chat)",
-        "category": "%category.kodik%"
-      },
-      {
-        "command": "cline.quickEditSelection",
-        "title": "Quick Edit Selection",
-        "category": "%category.kodik%"
-      },
-      {
-        "command": "cline.quickEditCurrentLine",
-        "title": "Quick Edit Current Line",
         "category": "%category.kodik%"
       }
     ],
