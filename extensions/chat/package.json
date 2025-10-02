@@ -35,8 +35,13 @@
   "activationEvents": [
     "onLanguage",
     "onStartupFinished",
-    "workspaceContains:evals.env",
-    "onUri"
+    "workspaceContains:evals.env"
+  ],
+  "enabledApiProposals": [
+    "inlineCompletionsAdditions",
+    "languageModelSystem",
+    "chatParticipantAdditions",
+    "defaultChatParticipant"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -95,17 +100,17 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "claude-dev-ActivityBar",
+          "id": "kodik-ActivityBar",
           "title": "Kodik",
           "icon": "assets/icons/icon.svg"
         }
       ]
     },
     "views": {
-      "claude-dev-ActivityBar": [
+      "kodik-ActivityBar": [
         {
           "type": "webview",
-          "id": "claude-dev.SidebarProvider",
+          "id": "kodik.SidebarProvider",
           "name": "",
           "icon": "assets/icons/icon.svg"
         }
@@ -146,6 +151,15 @@
         "command": "kodik.openInNewTab",
         "title": "%command.openInNewTab.title%",
         "category": "%category.kodik%"
+      },
+      {
+        "command": "kodik.openChatFromEditor",
+        "title": "Kodik: Open Chat",
+        "category": "%category.kodik%",
+        "icon": {
+          "light": "assets/icons/icon.svg",
+          "dark": "assets/icons/icon.svg"
+        }
       },
       {
         "command": "kodik.dev.createTestTasks",
@@ -206,8 +220,38 @@
         "category": "%category.kodik%"
       },
       {
-        "command": "cline.toggleAutocomplete",
+        "command": "kodik.autocomplete.toggle",
         "title": "Toggle Autocomplete",
+        "category": "%category.kodik%"
+      },
+      {
+        "command": "kodik.autocomplete.manualTrigger",
+        "title": "Manual Autocomplete Trigger (Debug)",
+        "category": "%category.kodik%"
+      },
+      {
+        "command": "kodik.autocomplete.debugStatus",
+        "title": "Autocomplete Debug Status",
+        "category": "%category.kodik%"
+      },
+      {
+        "command": "kodik.autocomplete.testCompletion",
+        "title": "Test Autocomplete Insertion",
+        "category": "%category.kodik%"
+      },
+      {
+        "command": "kodik.autocomplete.forceShow",
+        "title": "Force Show Autocomplete",
+        "category": "%category.kodik%"
+      },
+      {
+        "command": "kodik.autocomplete.insertCompletion",
+        "title": "Insert Autocomplete (Direct)",
+        "category": "%category.kodik%"
+      },
+      {
+        "command": "kodik.autocomplete.fixSettings",
+        "title": "Fix VS Code Inline Completion Settings",
         "category": "%category.kodik%"
       },
       {
@@ -248,7 +292,7 @@
         "when": "!editorHasSelection"
       },
       {
-        "command": "kodik.toggleAutocomplete",
+        "command": "kodik.autocomplete.toggle",
         "key": "ctrl+shift+a",
         "mac": "cmd+shift+a",
         "win": "ctrl+shift+a",
@@ -260,64 +304,64 @@
         {
           "command": "kodik.plusButtonClicked",
           "group": "navigation@1",
-          "when": "view == claude-dev.SidebarProvider"
+          "when": "view == kodik.SidebarProvider"
         },
         {
           "command": "kodik.mcpButtonClicked",
           "group": "navigation@2",
-          "when": "view == claude-dev.SidebarProvider"
+          "when": "view == kodik.SidebarProvider"
         },
         {
           "command": "kodik.historyButtonClicked",
           "group": "navigation@3",
-          "when": "view == claude-dev.SidebarProvider"
+          "when": "view == kodik.SidebarProvider"
         },
         {
           "command": "kodik.popoutButtonClicked",
           "group": "navigation@4",
-          "when": "view == claude-dev.SidebarProvider"
+          "when": "view == kodik.SidebarProvider"
         },
         {
           "command": "kodik.accountButtonClicked",
           "group": "navigation@5",
-          "when": "view == claude-dev.SidebarProvider"
+          "when": "view == kodik.SidebarProvider"
         },
         {
           "command": "kodik.settingsButtonClicked",
           "group": "navigation@6",
-          "when": "view == claude-dev.SidebarProvider"
+          "when": "view == kodik.SidebarProvider"
         }
       ],
       "editor/title": [
         {
           "command": "kodik.plusButtonClicked",
           "group": "navigation@1",
-          "when": "activeWebviewPanelId == claude-dev.TabPanelProvider"
+          "when": "activeWebviewPanelId == kodik.TabPanelProvider"
         },
         {
           "command": "kodik.mcpButtonClicked",
           "group": "navigation@2",
-          "when": "activeWebviewPanelId == claude-dev.TabPanelProvider"
+          "when": "activeWebviewPanelId == kodik.TabPanelProvider"
         },
         {
           "command": "kodik.historyButtonClicked",
           "group": "navigation@3",
-          "when": "activeWebviewPanelId == claude-dev.TabPanelProvider"
+          "when": "activeWebviewPanelId == kodik.TabPanelProvider"
         },
         {
           "command": "kodik.popoutButtonClicked",
           "group": "navigation@4",
-          "when": "activeWebviewPanelId == claude-dev.TabPanelProvider"
+          "when": "activeWebviewPanelId == kodik.TabPanelProvider"
         },
         {
           "command": "kodik.accountButtonClicked",
           "group": "navigation@5",
-          "when": "activeWebviewPanelId == claude-dev.TabPanelProvider"
+          "when": "activeWebviewPanelId == kodik.TabPanelProvider"
         },
         {
           "command": "kodik.settingsButtonClicked",
           "group": "navigation@6",
-          "when": "activeWebviewPanelId == claude-dev.TabPanelProvider"
+          "when": "activeWebviewPanelId == kodik.TabPanelProvider"
         }
       ],
       "editor/context": [
