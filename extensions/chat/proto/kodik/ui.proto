@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package cline;
-import "cline/common.proto";
-option java_package = "bot.cline.proto";
+package kodik;
+import "kodik/common.proto";
+option java_package = "bot.kodik.proto";
 option java_multiple_files = true;
 
 // Enum for webview provider types
@@ -17,14 +17,14 @@ message WebviewProviderTypeRequest {
   WebviewProviderType provider_type = 2;
 }
 
-// Enum for ClineMessage type
-enum ClineMessageType {
+// Enum for KodikMessage type
+enum KodikMessageType {
   ASK = 0;
   SAY = 1;
 }
 
-// Enum for ClineAsk types
-enum ClineAsk {
+// Enum for KodikAsk types
+enum KodikAsk {
   FOLLOWUP = 0;
   PLAN_MODE_RESPOND = 1;
   COMMAND = 2;
@@ -44,8 +44,8 @@ enum ClineAsk {
   SUMMARIZE_TASK = 16;
 }
 
-// Enum for ClineSay types
-enum ClineSay {
+// Enum for KodikSay types
+enum KodikSay {
   TASK = 0;
   ERROR = 1;
   API_REQ_STARTED = 2;
@@ -69,15 +69,15 @@ enum ClineSay {
   USE_MCP_SERVER_SAY = 20;
   DIFF_ERROR = 21;
   DELETED_API_REQS = 22;
-  CLINEIGNORE_ERROR = 23;
+  KODIKIGNORE_ERROR = 23;
   CHECKPOINT_CREATED = 24;
   LOAD_MCP_DOCUMENTATION = 25;
   INFO = 26;
   TASK_PROGRESS = 27;
 }
 
-// Enum for ClineSayTool tool types
-enum ClineSayToolType {
+// Enum for KodikSayTool tool types
+enum KodikSayToolType {
   EDITED_EXISTING_FILE = 0;
   NEW_FILE_CREATED = 1;
   READ_FILE = 2;
@@ -105,7 +105,7 @@ enum McpServerRequestType {
 }
 
 // Enum for API request cancel reasons
-enum ClineApiReqCancelReason {
+enum KodikApiReqCancelReason {
   STREAMING_FAILED = 0;
   USER_CANCELLED = 1;
   RETRIES_EXHAUSTED = 2;
@@ -117,9 +117,9 @@ message ConversationHistoryDeletedRange {
   int32 end_index = 2;
 }
 
-// Message for ClineSayTool
-message ClineSayTool {
-  ClineSayToolType tool = 1;
+// Message for KodikSayTool
+message KodikSayTool {
+  KodikSayToolType tool = 1;
   string path = 2;
   string diff = 3;
   string content = 4;
@@ -128,8 +128,8 @@ message ClineSayTool {
   bool operation_is_located_in_workspace = 7;
 }
 
-// Message for ClineSayBrowserAction
-message ClineSayBrowserAction {
+// Message for KodikSayBrowserAction
+message KodikSayBrowserAction {
   BrowserAction action = 1;
   string coordinate = 2;
   string text = 3;
@@ -143,8 +143,8 @@ message BrowserActionResult {
   string current_mouse_position = 4;
 }
 
-// Message for ClineAskUseMcpServer
-message ClineAskUseMcpServer {
+// Message for KodikAskUseMcpServer
+message KodikAskUseMcpServer {
   string server_name = 1;
   McpServerRequestType type = 2;
   string tool_name = 3;
@@ -152,22 +152,22 @@ message ClineAskUseMcpServer {
   string uri = 5;
 }
 
-// Message for ClinePlanModeResponse
-message ClinePlanModeResponse {
+// Message for KodikPlanModeResponse
+message KodikPlanModeResponse {
   string response = 1;
   repeated string options = 2;
   string selected = 3;
 }
 
-// Message for ClineAskQuestion
-message ClineAskQuestion {
+// Message for KodikAskQuestion
+message KodikAskQuestion {
   string question = 1;
   repeated string options = 2;
   string selected = 3;
 }
 
-// Message for ClineAskNewTask
-message ClineAskNewTask {
+// Message for KodikAskNewTask
+message KodikAskNewTask {
   string context = 1;
 }
 
@@ -179,25 +179,25 @@ message ApiReqRetryStatus {
   string error_snippet = 4;
 }
 
-// Message for ClineApiReqInfo
-message ClineApiReqInfo {
+// Message for KodikApiReqInfo
+message KodikApiReqInfo {
   string request = 1;
   int32 tokens_in = 2;
   int32 tokens_out = 3;
   int32 cache_writes = 4;
   int32 cache_reads = 5;
   double cost = 6;
-  ClineApiReqCancelReason cancel_reason = 7;
+  KodikApiReqCancelReason cancel_reason = 7;
   string streaming_failed_message = 8;
   ApiReqRetryStatus retry_status = 9;
 }
 
-// Main ClineMessage type
-message ClineMessage {
+// Main KodikMessage type
+message KodikMessage {
   int64 ts = 1;
-  ClineMessageType type = 2;
-  ClineAsk ask = 3;
-  ClineSay say = 4;
+  KodikMessageType type = 2;
+  KodikAsk ask = 3;
+  KodikSay say = 4;
   string text = 5;
   string reasoning = 6;
   repeated string images = 7;
@@ -210,14 +210,14 @@ message ClineMessage {
   ConversationHistoryDeletedRange conversation_history_deleted_range = 14;
   
   // Additional fields for specific ask/say types
-  ClineSayTool say_tool = 15;
-  ClineSayBrowserAction say_browser_action = 16;
+  KodikSayTool say_tool = 15;
+  KodikSayBrowserAction say_browser_action = 16;
   BrowserActionResult browser_action_result = 17;
-  ClineAskUseMcpServer ask_use_mcp_server = 18;
-  ClinePlanModeResponse plan_mode_response = 19;
-  ClineAskQuestion ask_question = 20;
-  ClineAskNewTask ask_new_task = 21;
-  ClineApiReqInfo api_req_info = 22;
+  KodikAskUseMcpServer ask_use_mcp_server = 18;
+  KodikPlanModeResponse plan_mode_response = 19;
+  KodikAskQuestion ask_question = 20;
+  KodikAskNewTask ask_new_task = 21;
+  KodikApiReqInfo api_req_info = 22;
 }
 
 // UiService provides methods for managing UI interactions
@@ -246,8 +246,8 @@ service UiService {
   // Subscribe to settings button clicked events
   rpc subscribeToSettingsButtonClicked(WebviewProviderTypeRequest) returns (stream Empty);
   
-  // Subscribe to partial message updates (streaming Cline messages as they're built)
-  rpc subscribeToPartialMessage(EmptyRequest) returns (stream ClineMessage);
+  // Subscribe to partial message updates (streaming Kodik messages as they're built)
+  rpc subscribeToPartialMessage(EmptyRequest) returns (stream KodikMessage);
   
   // Initialize webview when it launches
   rpc initializeWebview(EmptyRequest) returns (Empty);

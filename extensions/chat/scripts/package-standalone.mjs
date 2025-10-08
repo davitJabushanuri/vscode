@@ -70,7 +70,7 @@ async function zipDistribution() {
 	// Also ignore the dist directory, the build directory for the extension.
 	const isIgnored = createIsIgnored(["dist/**"])
 
-	// Add the whole cline directory under "extension", except the for the ignored files.
+	// Add the whole kodik directory under "extension", except the for the ignored files.
 	archive.directory(process.cwd(), "extension", (entry) => {
 		if (isIgnored(entry.name)) {
 			log_verbose("Ignoring", entry.name)

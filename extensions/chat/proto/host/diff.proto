@@ -1,10 +1,10 @@
 syntax = "proto3";
 
 package host;
-option java_package = "bot.cline.host.proto";
+option java_package = "bot.kodik.host.proto";
 option java_multiple_files = true;
 
-import "cline/common.proto";
+import "kodik/common.proto";
 
 // Provides methods for diff views.
 service DiffService {
@@ -35,7 +35,7 @@ service DiffService {
 }
 
 message OpenDiffRequest {
-  optional cline.Metadata metadata = 1;
+  optional kodik.Metadata metadata = 1;
   // The absolute path of the document being edited.
   optional string path = 2;
   // The new content for the file.
@@ -48,7 +48,7 @@ message OpenDiffResponse {
 }
 
 message GetDocumentTextRequest {
-  optional cline.Metadata metadata = 1;
+  optional kodik.Metadata metadata = 1;
   optional string diff_id = 2;
 }
 
@@ -57,7 +57,7 @@ message GetDocumentTextResponse {
 }
 
 message ReplaceTextRequest {
-  optional cline.Metadata metadata = 1;
+  optional kodik.Metadata metadata = 1;
   optional string diff_id = 2;
   optional string content = 3;
   optional int32 start_line = 4;
@@ -74,7 +74,7 @@ message ScrollDiffRequest {
 message ScrollDiffResponse {}
 
 message TruncateDocumentRequest {
-  optional cline.Metadata metadata = 1;
+  optional kodik.Metadata metadata = 1;
   optional string diff_id = 2;
   optional int32 end_line = 3;
 }
@@ -86,7 +86,7 @@ message CloseAllDiffsRequest {}
 message CloseAllDiffsResponse {}
 
 message SaveDocumentRequest {
-  optional cline.Metadata metadata = 1;
+  optional kodik.Metadata metadata = 1;
   optional string diff_id = 2;
 }
 

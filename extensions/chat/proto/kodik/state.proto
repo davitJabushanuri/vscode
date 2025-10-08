@@ -1,7 +1,7 @@
 syntax = "proto3";
-package cline;
-import "cline/common.proto";
-option java_package = "bot.cline.proto";
+package kodik;
+import "kodik/common.proto";
+option java_package = "bot.kodik.proto";
 option java_multiple_files = true;
 
 service StateService {
@@ -256,7 +256,7 @@ message ApiConfiguration {
   optional string aws_authentication = 301;
   optional string aws_bedrock_api_key = 302;
 
-  optional string cline_account_id = 303;
+  optional string kodik_account_id = 303;
 }
 
 message UpdateTerminalConnectionTimeoutRequest {

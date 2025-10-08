@@ -4,6 +4,7 @@
 	"applicationName": "kodik",
 	"dataFolderName": ".kodik",
 	"win32MutexName": "kodik",
+	"commit": "5ac81ea7a28ec956b7b43549fce851a4e6b260b9",
 	"licenseName": "MIT",
 	"licenseUrl": "https://github.com/davitJabushanuri/kodik/blob/main/LICENSE",
 	"serverLicenseUrl": "https://github.com/davitJabushanuri/kodik/blob/main/LICENSE",

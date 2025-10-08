@@ -535,7 +535,7 @@ Registry.as<IConfigurationRegistry>(
 				"extensions.verifySignature",
 				"When enabled, extensions are verified to be signed before getting installed."
 			),
-			default: true,
+			default: false,
 			scope: ConfigurationScope.APPLICATION,
 			included: isNative,
 		},
