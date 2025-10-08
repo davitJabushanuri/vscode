@@ -61,6 +61,8 @@ module.exports.unicodeFilter = [
 	'!extensions/**/snippets/**',
 	'!extensions/**/colorize-fixtures/**',
 	'!extensions/terminal-suggest/src/shell/fishBuiltinsCache.ts',
+	'!extensions/chat/webview-ui/build/**',
+	'!extensions/chat/esbuild.mjs',
 
 	'!src/vs/base/browser/dompurify/**',
 	'!src/vs/workbench/services/keybinding/browser/keyboardLayouts/**',
@@ -111,6 +113,7 @@ module.exports.indentationFilter = [
 	// except multiple specific files
 	'!**/package.json',
 	'!**/package-lock.json',
+	'!**/product.json',
 
 	// except multiple specific folders
 	'!**/codicon/**',
@@ -144,6 +147,8 @@ module.exports.indentationFilter = [
 	'!extensions/ipynb/notebook-out/**',
 	'!extensions/notebook-renderers/renderer-out/*.js',
 	'!extensions/simple-browser/media/*.js',
+	'!extensions/chat/webview-ui/build/**',
+	'!extensions/chat/esbuild.mjs',
 ];
 
 module.exports.copyrightFilter = [
@@ -184,6 +189,8 @@ module.exports.copyrightFilter = [
 	'!extensions/typescript-language-features/node-maintainer/**',
 	'!extensions/html-language-features/server/src/modes/typescript/*',
 	'!extensions/*/server/bin/*',
+	'!extensions/chat/webview-ui/build/**',
+	'!extensions/chat/esbuild.mjs',
 ];
 
 module.exports.tsFormattingFilter = [

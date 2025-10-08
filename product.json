@@ -1,124 +1,123 @@
 {
-	"nameShort": "Kodik",
-	"nameLong": "Kodik",
-	"applicationName": "kodik",
-	"dataFolderName": ".kodik",
-	"win32MutexName": "kodik",
-	"commit": "5ac81ea7a28ec956b7b43549fce851a4e6b260b9",
-	"licenseName": "MIT",
-	"licenseUrl": "https://github.com/davitJabushanuri/kodik/blob/main/LICENSE",
-	"serverLicenseUrl": "https://github.com/davitJabushanuri/kodik/blob/main/LICENSE",
-	"serverGreeting": [],
-	"serverLicense": [],
-	"serverLicensePrompt": "",
-	"serverApplicationName": "kodik-server",
-	"serverDataFolderName": ".kodik-server",
-	"tunnelApplicationName": "kodik-tunnel",
-	"win32DirName": "Kodik",
-	"win32NameVersion": "Kodik",
-	"win32RegValueName": "Kodik",
-	"win32x64AppId": "{{D77B7E06-80BA-4137-BCF4-654B95CCEBC5}",
-	"win32arm64AppId": "{{D1ACE434-89C5-48D1-88D3-E2991DF85475}",
-	"win32x64UserAppId": "{{CC6B787D-37A0-49E8-AE24-8559A032BE0C}",
-	"win32arm64UserAppId": "{{3AEBF0C8-F733-4AD4-BADE-FDB816D53D7B}",
-	"win32AppUserModelId": "Kodik.Kodik",
-	"win32ShellNameShort": "&Kodik",
-	"win32TunnelServiceMutex": "kodik-tunnelservice",
-	"win32TunnelMutex": "kodik-tunnel",
-	"darwinBundleIdentifier": "com.kodik.app",
-	"darwinProfileUUID": "47827DD9-4734-49A0-AF80-7E19B11495CC",
-	"darwinProfilePayloadUUID": "CF808BE7-53F3-46C6-A7E2-7EDB98A5E959",
-	"linuxIconName": "kodik",
-	"licenseFileName": "LICENSE",
-	"reportIssueUrl": "https://github.com/davitJabushanuri/kodik/issues/new",
-	"nodejsRepository": "https://nodejs.org",
-	"urlProtocol": "kodik",
-	"webviewContentExternalBaseUrlTemplate": "https://{{uuid}}.vscode-cdn.net/insider/ef65ac1ba57f57f2a3961bfe94aa20481caca4c6/out/vs/workbench/contrib/webview/browser/pre/",
-	"extensionsGallery": {
-		"serviceUrl": "https://marketplace.visualstudio.com/_apis/public/gallery",
-		"cacheUrl": "https://vscode.blob.core.windows.net/gallery/index",
-		"itemUrl": "https://marketplace.visualstudio.com/items",
-		"publisherUrl": "https://marketplace.visualstudio.com/publishers/{publisher}",
-		"resourceUrlTemplate": "https://{publisher}.vscode-unpkg.net/{publisher}/{name}/{version}/{path}",
-		"controlUrl": "",
-		"recommendationsUrl": ""
-	},
-	"extensionTips": {
-		"ms-python.python": "Write Python code",
-		"ms-vscode.cpptools": "Write C/C++ code",
-		"ms-dotnettools.csharp": "Write C# code",
-		"ms-vscode.vscode-typescript-next": "Improve TypeScript development",
-		"ms-vscode.js-debug": "Debug JavaScript/TypeScript",
-		"esbenp.prettier-vscode": "Format your code",
-		"ms-vscode.vscode-json": "Work with JSON files",
-		"redhat.vscode-yaml": "Work with YAML files"
-	},
-	"extensionImportantTips": {
-		"ms-python.python": {
-			"name": "Python",
-			"languages": ["python"],
-			"pattern": "**/*.py"
-		},
-		"ms-vscode.cpptools": {
-			"name": "C/C++",
-			"languages": ["c", "cpp"],
-			"pattern": "**/*.{c,cpp,cc,cxx,h,hpp}"
-		}
-	},
-	"configBasedExtensionTips": {
-		"ms-python.python": {
-			"configPath": "",
-			"configName": "Python"
-		}
-	},
-	"builtInExtensions": [
-		{
-			"name": "ms-vscode.js-debug-companion",
-			"version": "1.1.3",
-			"sha256": "7380a890787452f14b2db7835dfa94de538caf358ebc263f9d46dd68ac52de93",
-			"repo": "https://github.com/microsoft/vscode-js-debug-companion",
-			"metadata": {
-				"id": "99cb0b7f-7354-4278-b8da-6cc79972169d",
-				"publisherId": {
-					"publisherId": "5f5636e7-69ed-4afe-b5d6-8d231fb3d3ee",
-					"publisherName": "ms-vscode",
-					"displayName": "Microsoft",
-					"flags": "verified"
-				},
-				"publisherDisplayName": "Microsoft"
-			}
-		},
-		{
-			"name": "ms-vscode.js-debug",
-			"version": "1.102.0",
-			"sha256": "0e8ed27ba2d707bcfb008e89e490c2d287d9537d84893b0792a4ee418274fa0b",
-			"repo": "https://github.com/microsoft/vscode-js-debug",
-			"metadata": {
-				"id": "25629058-ddac-4e17-abba-74678e126c5d",
-				"publisherId": {
-					"publisherId": "5f5636e7-69ed-4afe-b5d6-8d231fb3d3ee",
-					"publisherName": "ms-vscode",
-					"displayName": "Microsoft",
-					"flags": "verified"
-				},
-				"publisherDisplayName": "Microsoft"
-			}
-		},
-		{
-			"name": "ms-vscode.vscode-js-profile-table",
-			"version": "1.0.10",
-			"sha256": "7361748ddf9fd09d8a2ed1f2a2d7376a2cf9aae708692820b799708385c38e08",
-			"repo": "https://github.com/microsoft/vscode-js-profile-visualizer",
-			"metadata": {
-				"id": "7e52b41b-71ad-457b-ab7e-0620f1fc4feb",
-				"publisherId": {
-					"publisherId": "5f5636e7-69ed-4afe-b5d6-8d231fb3d3ee",
-					"publisherName": "ms-vscode",
-					"displayName": "Microsoft",
-					"flags": "verified"
-				},
-				"publisherDisplayName": "Microsoft"
-			}
-		}
-	]
+  "nameShort": "Kodik",
+  "nameLong": "Kodik",
+  "applicationName": "kodik",
+  "dataFolderName": ".kodik",
+  "win32MutexName": "kodik",
+  "licenseName": "MIT",
+  "licenseUrl": "https://github.com/davitJabushanuri/kodik/blob/main/LICENSE",
+  "serverLicenseUrl": "https://github.com/davitJabushanuri/kodik/blob/main/LICENSE",
+  "serverGreeting": [],
+  "serverLicense": [],
+  "serverLicensePrompt": "",
+  "serverApplicationName": "kodik-server",
+  "serverDataFolderName": ".kodik-server",
+  "tunnelApplicationName": "kodik-tunnel",
+  "win32DirName": "Kodik",
+  "win32NameVersion": "Kodik",
+  "win32RegValueName": "Kodik",
+  "win32x64AppId": "{{D77B7E06-80BA-4137-BCF4-654B95CCEBC5}",
+  "win32arm64AppId": "{{D1ACE434-89C5-48D1-88D3-E2991DF85475}",
+  "win32x64UserAppId": "{{CC6B787D-37A0-49E8-AE24-8559A032BE0C}",
+  "win32arm64UserAppId": "{{3AEBF0C8-F733-4AD4-BADE-FDB816D53D7B}",
+  "win32AppUserModelId": "Kodik.Kodik",
+  "win32ShellNameShort": "&Kodik",
+  "win32TunnelServiceMutex": "kodik-tunnelservice",
+  "win32TunnelMutex": "kodik-tunnel",
+  "darwinBundleIdentifier": "com.kodik.app",
+  "darwinProfileUUID": "47827DD9-4734-49A0-AF80-7E19B11495CC",
+  "darwinProfilePayloadUUID": "CF808BE7-53F3-46C6-A7E2-7EDB98A5E959",
+  "linuxIconName": "kodik",
+  "licenseFileName": "LICENSE",
+  "reportIssueUrl": "https://github.com/davitJabushanuri/kodik/issues/new",
+  "nodejsRepository": "https://nodejs.org",
+  "urlProtocol": "kodik",
+  "webviewContentExternalBaseUrlTemplate": "https://{{uuid}}.vscode-cdn.net/insider/ef65ac1ba57f57f2a3961bfe94aa20481caca4c6/out/vs/workbench/contrib/webview/browser/pre/",
+  "extensionsGallery": {
+    "serviceUrl": "https://marketplace.visualstudio.com/_apis/public/gallery",
+    "cacheUrl": "https://vscode.blob.core.windows.net/gallery/index",
+    "itemUrl": "https://marketplace.visualstudio.com/items",
+    "publisherUrl": "https://marketplace.visualstudio.com/publishers/{publisher}",
+    "resourceUrlTemplate": "https://{publisher}.vscode-unpkg.net/{publisher}/{name}/{version}/{path}",
+    "controlUrl": "",
+    "recommendationsUrl": ""
+  },
+  "extensionTips": {
+    "ms-python.python": "Write Python code",
+    "ms-vscode.cpptools": "Write C/C++ code",
+    "ms-dotnettools.csharp": "Write C# code",
+    "ms-vscode.vscode-typescript-next": "Improve TypeScript development",
+    "ms-vscode.js-debug": "Debug JavaScript/TypeScript",
+    "esbenp.prettier-vscode": "Format your code",
+    "ms-vscode.vscode-json": "Work with JSON files",
+    "redhat.vscode-yaml": "Work with YAML files"
+  },
+  "extensionImportantTips": {
+    "ms-python.python": {
+      "name": "Python",
+      "languages": ["python"],
+      "pattern": "**/*.py"
+    },
+    "ms-vscode.cpptools": {
+      "name": "C/C++",
+      "languages": ["c", "cpp"],
+      "pattern": "**/*.{c,cpp,cc,cxx,h,hpp}"
+    }
+  },
+  "configBasedExtensionTips": {
+    "ms-python.python": {
+      "configPath": "",
+      "configName": "Python"
+    }
+  },
+  "builtInExtensions": [
+    {
+      "name": "ms-vscode.js-debug-companion",
+      "version": "1.1.3",
+      "sha256": "7380a890787452f14b2db7835dfa94de538caf358ebc263f9d46dd68ac52de93",
+      "repo": "https://github.com/microsoft/vscode-js-debug-companion",
+      "metadata": {
+        "id": "99cb0b7f-7354-4278-b8da-6cc79972169d",
+        "publisherId": {
+          "publisherId": "5f5636e7-69ed-4afe-b5d6-8d231fb3d3ee",
+          "publisherName": "ms-vscode",
+          "displayName": "Microsoft",
+          "flags": "verified"
+        },
+        "publisherDisplayName": "Microsoft"
+      }
+    },
+    {
+      "name": "ms-vscode.js-debug",
+      "version": "1.102.0",
+      "sha256": "0e8ed27ba2d707bcfb008e89e490c2d287d9537d84893b0792a4ee418274fa0b",
+      "repo": "https://github.com/microsoft/vscode-js-debug",
+      "metadata": {
+        "id": "25629058-ddac-4e17-abba-74678e126c5d",
+        "publisherId": {
+          "publisherId": "5f5636e7-69ed-4afe-b5d6-8d231fb3d3ee",
+          "publisherName": "ms-vscode",
+          "displayName": "Microsoft",
+          "flags": "verified"
+        },
+        "publisherDisplayName": "Microsoft"
+      }
+    },
+    {
+      "name": "ms-vscode.vscode-js-profile-table",
+      "version": "1.0.10",
+      "sha256": "7361748ddf9fd09d8a2ed1f2a2d7376a2cf9aae708692820b799708385c38e08",
+      "repo": "https://github.com/microsoft/vscode-js-profile-visualizer",
+      "metadata": {
+        "id": "7e52b41b-71ad-457b-ab7e-0620f1fc4feb",
+        "publisherId": {
+          "publisherId": "5f5636e7-69ed-4afe-b5d6-8d231fb3d3ee",
+          "publisherName": "ms-vscode",
+          "displayName": "Microsoft",
+          "flags": "verified"
+        },
+        "publisherDisplayName": "Microsoft"
+      }
+    }
+  ]
 }

@@ -123,8 +123,8 @@ Perfect for exploring different solutions without fear of breaking your code.
 
 ## Contributing
 
-Contributions are welcome! Please see our [Contributing Guide](https://github.com/mike2505/KodikAI/blob/main/CONTRIBUTING.md) for details on how to get started.
+Contributions are welcome! Please see our [Contributing Guide](https://github.com/davitJabushanuri/kodik/blob/HEAD/CONTRIBUTING.md) for details on how to get started.
 
 ## License
 
-[Apache 2.0 © 2025 Kodik](https://github.com/mike2505/KodikAI/blob/main/LICENSE)
+[Apache 2.0 © 2025 Kodik](https://github.com/davitJabushanuri/kodik/blob/HEAD/LICENSE)

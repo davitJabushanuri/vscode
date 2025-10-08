@@ -89,36 +89,64 @@ const copyWasmFiles = {
 	name: "copy-wasm-files",
 	setup(build) {
 		build.onEnd(() => {
-			// tree sitter
-			const sourceDir = path.join(__dirname, "node_modules", "web-tree-sitter")
-			const targetDir = path.join(__dirname, destDir)
+			try {
+				// tree sitter
+				const sourceDir = path.join(__dirname, "node_modules", "web-tree-sitter")
+				const targetDir = path.join(__dirname, destDir)
 
-			// Copy tree-sitter.wasm
-			fs.copyFileSync(path.join(sourceDir, "tree-sitter.wasm"), path.join(targetDir, "tree-sitter.wasm"))
+				// Ensure target directory exists
+				if (!fs.existsSync(targetDir)) {
+					fs.mkdirSync(targetDir, { recursive: true })
+				}
 
-			// Copy language-specific WASM files
-			const languageWasmDir = path.join(__dirname, "node_modules", "tree-sitter-wasms", "out")
-			const languages = [
-				"typescript",
-				"tsx",
-				"python",
-				"rust",
-				"javascript",
-				"go",
-				"cpp",
-				"c",
-				"c_sharp",
-				"ruby",
-				"java",
-				"php",
-				"swift",
-				"kotlin",
-			]
+				// Copy tree-sitter.wasm
+				const treeSitterWasmSource = path.join(sourceDir, "tree-sitter.wasm")
+				const treeSitterWasmTarget = path.join(targetDir, "tree-sitter.wasm")
 
-			languages.forEach((lang) => {
-				const filename = `tree-sitter-${lang}.wasm`
-				fs.copyFileSync(path.join(languageWasmDir, filename), path.join(targetDir, filename))
-			})
+				if (fs.existsSync(treeSitterWasmSource)) {
+					fs.copyFileSync(treeSitterWasmSource, treeSitterWasmTarget)
+				} else {
+					console.warn(`Warning: tree-sitter.wasm not found at ${treeSitterWasmSource}`)
+				}
+
+				// Copy language-specific WASM files
+				const languageWasmDir = path.join(__dirname, "node_modules", "tree-sitter-wasms", "out")
+				const languages = [
+					"typescript",
+					"tsx",
+					"python",
+					"rust",
+					"javascript",
+					"go",
+					"cpp",
+					"c",
+					"c_sharp",
+					"ruby",
+					"java",
+					"php",
+					"swift",
+					"kotlin",
+				]
+
+				if (fs.existsSync(languageWasmDir)) {
+					languages.forEach((lang) => {
+						const filename = `tree-sitter-${lang}.wasm`
+						const sourcePath = path.join(languageWasmDir, filename)
+						const targetPath = path.join(targetDir, filename)
+
+						if (fs.existsSync(sourcePath)) {
+							fs.copyFileSync(sourcePath, targetPath)
+						} else {
+							console.warn(`Warning: ${filename} not found at ${sourcePath}`)
+						}
+					})
+				} else {
+					console.warn(`Warning: Language WASM directory not found at ${languageWasmDir}`)
+				}
+			} catch (error) {
+				console.error(`Error copying WASM files: ${error.message}`)
+				throw error
+			}
 		})
 	},
 }
@@ -152,7 +180,7 @@ const extensionConfig = {
 	...baseConfig,
 	entryPoints: ["src/extension.ts"],
 	outfile: `${destDir}/extension.js`,
-	external: ["vscode"],
+	external: ["vscode", "source-map"],
 }
 
 // Standalone-specific configuration
@@ -162,7 +190,7 @@ const standaloneConfig = {
 	outfile: `${destDir}/kodik-core.js`,
 	// These gRPC protos need to load files from the module directory at runtime,
 	// so they cannot be bundled.
-	external: ["vscode", "@grpc/reflection", "grpc-health-check"],
+	external: ["vscode", "@grpc/reflection", "grpc-health-check", "source-map"],
 }
 
 // E2E build script configuration

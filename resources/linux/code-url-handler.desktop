@@ -8,6 +8,6 @@ Type=Application
 NoDisplay=true
 StartupNotify=true
 Categories=TextEditor;Development;IDE;
-MimeType=application/x-@@NAME@@-workspace;
+MimeType=application/x-@@NAME@@-workspace;x-scheme-handler/kodik;
 Actions=new-empty-window;
 Keywords=kodik;
