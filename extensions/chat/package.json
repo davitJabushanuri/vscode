@@ -45,7 +45,8 @@
     "inlineCompletionsAdditions",
     "languageModelSystem",
     "chatParticipantAdditions",
-    "defaultChatParticipant"
+    "defaultChatParticipant",
+    "contribSourceControlInputBoxMenu"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -153,7 +154,7 @@
         "command": "kodik.generateGitCommitMessage",
         "title": "%command.generateCommitMessage.title%",
         "category": "%category.kodik%",
-        "icon": "$(robot)"
+        "icon": "$(sparkle)"
       },
       {
         "command": "kodik.abortGitCommitMessage",
@@ -314,7 +315,7 @@
           "group": "navigation"
         }
       ],
-      "scm/title": [
+      "scm/inputBox": [
         {
           "command": "kodik.generateGitCommitMessage",
           "group": "navigation",

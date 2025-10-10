@@ -8,6 +8,15 @@ option java_multiple_files = true;
 service CheckpointsService {
   rpc checkpointDiff(Int64Request) returns (Empty);
   rpc checkpointRestore(CheckpointRestoreRequest) returns (Empty);
+  rpc getCheckpointFiles(Int64Request) returns (CheckpointFilesResponse);
+  rpc openFileDiff(OpenFileDiffRequest) returns (Empty);
+  rpc clearDiffDecorations(EmptyRequest) returns (Empty);
+}
+
+message OpenFileDiffRequest {
+  Metadata metadata = 1;
+  int64 checkpoint_ts = 2;
+  string file_path = 3;
 }
 
 message CheckpointRestoreRequest {
@@ -15,4 +24,17 @@ message CheckpointRestoreRequest {
   int64 number = 2;
   string restore_type = 3;
   optional int64 offset = 4;
+}
+
+message CheckpointFilesResponse {
+  Metadata metadata = 1;
+  repeated CheckpointFile files = 2;
+}
+
+message CheckpointFile {
+  string relative_path = 1;
+  string absolute_path = 2;
+  int32 lines_added = 3;
+  int32 lines_removed = 4;
+  string change_type = 5; // "added", "modified", "deleted"
 }
