@@ -17,6 +17,8 @@ message OpenFileDiffRequest {
   Metadata metadata = 1;
   int64 checkpoint_ts = 2;
   string file_path = 3;
+  optional string before_content = 4; // Optional: cached content before changes
+  optional string after_content = 5; // Optional: cached content after changes
 }
 
 message CheckpointRestoreRequest {
@@ -37,4 +39,6 @@ message CheckpointFile {
   int32 lines_added = 3;
   int32 lines_removed = 4;
   string change_type = 5; // "added", "modified", "deleted"
+  string before_content = 6; // File content before changes
+  string after_content = 7; // File content after changes
 }
