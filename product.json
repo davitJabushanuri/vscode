@@ -70,6 +70,63 @@
       "configName": "Python"
     }
   },
+  "extensionEnabledApiProposals": {
+    "kodik.chat": [
+      "inlineCompletionsAdditions",
+      "languageModelSystem",
+      "chatParticipantAdditions",
+      "defaultChatParticipant"
+    ],
+    "ms-python.python": [
+      "testObserver",
+      "contribEditorContentMenu",
+      "terminalDataWriteEvent",
+      "terminalExecuteCommandEvent",
+      "portsAttributes",
+      "authGetSessions",
+      "quickPickSortByLabel",
+      "createFileSystemWatcher",
+      "resolvers"
+    ],
+    "ms-python.vscode-pylance": [
+      "semanticTokensCurrentDocumentDelta",
+      "workspaceFoldersChangedEvent"
+    ],
+    "ms-vscode.cpptools": [
+      "terminalDataWriteEvent",
+      "terminalExecuteCommandEvent"
+    ],
+    "ms-dotnettools.csharp": ["terminalDataWriteEvent"],
+    "GitHub.copilot": [
+      "inlineCompletionsAdditions",
+      "languageModelSystem",
+      "chatParticipantAdditions",
+      "defaultChatParticipant"
+    ],
+    "GitHub.copilot-chat": [
+      "chatParticipantAdditions",
+      "defaultChatParticipant",
+      "languageModelSystem"
+    ],
+    "ms-toolsai.jupyter": [
+      "notebookMessaging",
+      "notebookDebugOptions",
+      "portsAttributes"
+    ],
+    "ms-vscode-remote.remote-ssh": [
+      "resolvers",
+      "tunnels",
+      "terminalDataWriteEvent"
+    ],
+    "ms-vscode-remote.remote-containers": [
+      "resolvers",
+      "tunnels",
+      "contribViewsRemote"
+    ],
+    "ms-azuretools.vscode-docker": ["terminalDataWriteEvent"],
+    "golang.go": ["terminalDataWriteEvent"],
+    "rust-lang.rust-analyzer": ["terminalDataWriteEvent"]
+  },
   "extensionAllowedProposedApi": [
     "ms-python.python",
     "ms-python.vscode-pylance",
