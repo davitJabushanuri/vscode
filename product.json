@@ -154,7 +154,8 @@
     "golang.go",
     "rust-lang.rust-analyzer",
     "dbaeumer.vscode-eslint",
-    "esbenp.prettier-vscode"
+    "esbenp.prettier-vscode",
+    "kodik.chat"
   ],
   "builtInExtensions": [
     {
