@@ -11,6 +11,8 @@ service CheckpointsService {
   rpc getCheckpointFiles(Int64Request) returns (CheckpointFilesResponse);
   rpc openFileDiff(OpenFileDiffRequest) returns (Empty);
   rpc clearDiffDecorations(EmptyRequest) returns (Empty);
+  rpc acceptFileChange(FileChangeActionRequest) returns (Empty);
+  rpc rejectFileChange(FileChangeActionRequest) returns (Empty);
 }
 
 message OpenFileDiffRequest {
@@ -41,4 +43,12 @@ message CheckpointFile {
   string change_type = 5; // "added", "modified", "deleted"
   string before_content = 6; // File content before changes
   string after_content = 7; // File content after changes
+}
+
+message FileChangeActionRequest {
+  Metadata metadata = 1;
+  int64 checkpoint_ts = 2;
+  string file_path = 3;
+  string before_content = 4; // Content before changes (for restore)
+  string after_content = 5; // Content after changes (for accept)
 }

@@ -77,6 +77,10 @@ export default {
 					foreground: "var(--vscode-badge-foreground)",
 					background: "var(--vscode-badge-background)",
 				},
+				testing: {
+					passed: "var(--vscode-testing-iconPassed)",
+					failed: "var(--vscode-testing-iconFailed)",
+				},
 				error: "var(--vscode-errorForeground)",
 				description: "var(--vscode-descriptionForeground)",
 			},

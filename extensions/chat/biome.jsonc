@@ -68,7 +68,7 @@
 				"noExplicitAny": "off",
 				"noControlCharactersInRegex": "off",
 				"noShadowRestrictedNames": "off",
-				"noArrayIndexKey": "info",
+				"noArrayIndexKey": "off",
 				"noAssignInExpressions": "warn"
 			},
 			"complexity": {
@@ -113,16 +113,16 @@
 	"files": {
 		"includes": [
 			"**",
-			"!**/dist/**",
-			"!**/dist-*/**",
-			"!**/out/**",
-			"!**/evals/**",
-			"!**/playwright/**",
-			"!**/test-results/**",
-			"!**/node_modules/**",
-			"!**/webview-ui/build/**",
-			"!**/generated/**",
-			"!**/proto/**"
+			"!**/dist",
+			"!**/dist-*",
+			"!**/out",
+			"!**/evals",
+			"!**/playwright",
+			"!**/test-results",
+			"!**/node_modules",
+			"!**/webview-ui/build",
+			"!**/generated",
+			"!**/proto"
 		]
 	},
 	"plugins": [

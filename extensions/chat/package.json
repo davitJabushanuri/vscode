@@ -198,6 +198,30 @@
         "category": "%category.kodik%"
       },
       {
+        "command": "kodik.acceptCurrentFileChange",
+        "title": "Accept Current File Changes",
+        "category": "%category.kodik%",
+        "icon": "$(check)"
+      },
+      {
+        "command": "kodik.rejectCurrentFileChange",
+        "title": "Reject Current File Changes",
+        "category": "%category.kodik%",
+        "icon": "$(close)"
+      },
+      {
+        "command": "kodik.previousFileChange",
+        "title": "Previous File Change",
+        "category": "%category.kodik%",
+        "icon": "$(chevron-left)"
+      },
+      {
+        "command": "kodik.nextFileChange",
+        "title": "Next File Change",
+        "category": "%category.kodik%",
+        "icon": "$(chevron-right)"
+      },
+      {
         "command": "kodik.autocomplete.insertCompletion",
         "title": "Insert Autocomplete (Direct)",
         "category": "%category.kodik%"
@@ -235,6 +259,38 @@
         "mac": "cmd+shift+a",
         "win": "ctrl+shift+a",
         "linux": "ctrl+shift+a"
+      },
+      {
+        "command": "kodik.fileReview.accept",
+        "key": "alt+a",
+        "mac": "alt+a",
+        "win": "alt+a",
+        "linux": "alt+a",
+        "when": "editorTextFocus && kodik.fileReview.active"
+      },
+      {
+        "command": "kodik.fileReview.reject",
+        "key": "alt+r",
+        "mac": "alt+r",
+        "win": "alt+r",
+        "linux": "alt+r",
+        "when": "editorTextFocus && kodik.fileReview.active"
+      },
+      {
+        "command": "kodik.fileReview.next",
+        "key": "alt+right",
+        "mac": "alt+right",
+        "win": "alt+right",
+        "linux": "alt+right",
+        "when": "editorTextFocus && kodik.fileReview.active"
+      },
+      {
+        "command": "kodik.fileReview.previous",
+        "key": "alt+left",
+        "mac": "alt+left",
+        "win": "alt+left",
+        "linux": "alt+left",
+        "when": "editorTextFocus && kodik.fileReview.active"
       }
     ],
     "menus": {
@@ -300,6 +356,26 @@
           "command": "kodik.settingsButtonClicked",
           "group": "navigation@6",
           "when": "activeWebviewPanelId == kodik.TabPanelProvider"
+        },
+        {
+          "command": "kodik.previousFileChange",
+          "group": "navigation",
+          "when": "kodik.hasFileChanges"
+        },
+        {
+          "command": "kodik.nextFileChange",
+          "group": "navigation",
+          "when": "kodik.hasFileChanges"
+        },
+        {
+          "command": "kodik.acceptCurrentFileChange",
+          "group": "navigation",
+          "when": "kodik.hasFileChanges"
+        },
+        {
+          "command": "kodik.rejectCurrentFileChange",
+          "group": "navigation",
+          "when": "kodik.hasFileChanges"
         }
       ],
       "editor/context": [
